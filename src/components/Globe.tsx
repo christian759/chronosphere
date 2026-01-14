@@ -1,85 +1,144 @@
 import { useRef, useMemo, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Stars, Html, Line } from '@react-three/drei';
+import { OrbitControls, Stars, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { useWorldTime, type CityData } from '../hooks/useWorldTime';
 import { latLongToVector3 } from '../utils/coordinates';
 
-// Simplified continent outlines (sample coordinates for visual effect)
-const CONTINENT_PATHS = [
-    // North America outline (simplified)
-    [
-        [-170, 70], [-140, 70], [-120, 60], [-100, 50], [-90, 30], [-80, 25], [-75, 45], [-60, 50], [-50, 60], [-170, 70]
+// Detailed continent outlines
+const CONTINENTS = {
+    northAmerica: [
+        [-170, 70], [-140, 70], [-130, 60], [-125, 50], [-122, 48],
+        [-115, 50], [-95, 50], [-82, 50], [-75, 45], [-70, 47],
+        [-65, 50], [-60, 55], [-55, 60], [-60, 70], [-90, 75],
+        [-120, 75], [-150, 72], [-170, 70]
     ],
-    // South America outline (simplified)
-    [
-        [-80, 10], [-70, -10], [-60, -30], [-55, -50], [-70, -55], [-75, -35], [-80, 10]
+    southAmerica: [
+        [-80, 12], [-75, 5], [-70, -5], [-60, -15], [-55, -25],
+        [-50, -35], [-55, -50], [-65, -55], [-72, -50], [-75, -35],
+        [-78, -15], [-80, 5], [-80, 12]
     ],
-    // Europe outline (simplified)
-    [
-        [-10, 50], [0, 60], [20, 70], [40, 60], [30, 50], [20, 45], [10, 40], [-10, 50]
+    europe: [
+        [-10, 55], [0, 60], [10, 60], [20, 55], [30, 60], [40, 70],
+        [60, 70], [65, 60], [60, 50], [50, 45], [40, 40], [30, 38],
+        [20, 40], [10, 43], [0, 48], [-10, 55]
     ],
-    // Africa outline (simplified)
-    [
-        [-20, 35], [0, 30], [30, 20], [40, 0], [40, -20], [20, -35], [10, -30], [5, -10], [-20, 10], [-20, 35]
+    africa: [
+        [-18, 35], [0, 37], [20, 32], [35, 30], [42, 20], [45, 5],
+        [42, -10], [35, -25], [28, -34], [18, -35], [12, -25],
+        [10, -10], [15, 10], [18, 20], [10, 30], [-5, 35], [-18, 35]
     ],
-    // Asia outline (simplified)
-    [
-        [40, 70], [60, 75], [100, 70], [140, 60], [150, 40], [140, 20], [120, 10], [100, 0], [80, 10], [60, 20], [40, 30], [40, 70]
+    asia: [
+        [30, 45], [40, 50], [50, 55], [60, 65], [70, 75], [90, 78],
+        [110, 75], [130, 70], [145, 60], [155, 45], [160, 30],
+        [155, 20], [145, 15], [130, 10], [115, 5], [100, -5],
+        [90, -10], [80, -5], [70, 10], [60, 25], [50, 35],
+        [40, 40], [30, 45]
     ],
-    // Australia outline (simplified)
-    [
-        [110, -10], [130, -12], [150, -25], [145, -40], [130, -35], [115, -30], [110, -10]
+    australia: [
+        [113, -10], [125, -12], [135, -12], [145, -15], [150, -25],
+        [153, -35], [148, -39], [140, -38], [130, -32], [118, -20],
+        [113, -10]
     ]
-];
+};
 
-function ContinentLines({ radius = 2.5 }: { radius?: number }) {
+function ContinentLines({ radius }: { radius: number }) {
     return (
         <>
-            {CONTINENT_PATHS.map((path, idx) => {
-                const points = path.map(([lng, lat]) => {
+            {Object.entries(CONTINENTS).map(([name, points]) => {
+                const vertices = points.map(([lng, lat]) => {
                     const vec = latLongToVector3(lat, lng, radius + 0.01);
                     return new THREE.Vector3(vec[0], vec[1], vec[2]);
                 });
 
                 return (
-                    <Line
-                        key={idx}
-                        points={points}
-                        color="#444444"
-                        lineWidth={2}
-                        transparent
-                        opacity={0.6}
-                    />
+                    <line key={name}>
+                        <bufferGeometry>
+                            <bufferAttribute
+                                attach="attributes-position"
+                                count={vertices.length}
+                                array={new Float32Array(vertices.flatMap(v => [v.x, v.y, v.z]))}
+                                itemSize={3}
+                            />
+                        </bufferGeometry>
+                        <lineBasicMaterial color="#4a7c2e" linewidth={2} />
+                    </line>
                 );
             })}
         </>
     );
 }
 
-function CityMarker({ city, radius, onSelect }: { city: CityData; radius: number; onSelect: (c: CityData) => void }) {
+function GridLines({ radius }: { radius: number }) {
+    return (
+        <>
+            {/* Latitude lines */}
+            {[-60, -30, 0, 30, 60].map((lat) => {
+                const points = Array.from({ length: 73 }).map((_, i) => {
+                    const lng = i * 5 - 180;
+                    const vec = latLongToVector3(lat, lng, radius + 0.002);
+                    return new THREE.Vector3(vec[0], vec[1], vec[2]);
+                });
+
+                return (
+                    <line key={`lat-${lat}`}>
+                        <bufferGeometry>
+                            <bufferAttribute
+                                attach="attributes-position"
+                                count={points.length}
+                                array={new Float32Array(points.flatMap(v => [v.x, v.y, v.z]))}
+                                itemSize={3}
+                            />
+                        </bufferGeometry>
+                        <lineBasicMaterial color="#444444" opacity={0.3} transparent />
+                    </line>
+                );
+            })}
+
+            {/* Longitude lines */}
+            {Array.from({ length: 12 }).map((_, i) => {
+                const lng = i * 30 - 180;
+                const points = Array.from({ length: 37 }).map((_, j) => {
+                    const lat = j * 5 - 90;
+                    const vec = latLongToVector3(lat, lng, radius + 0.002);
+                    return new THREE.Vector3(vec[0], vec[1], vec[2]);
+                });
+
+                return (
+                    <line key={`lng-${lng}`}>
+                        <bufferGeometry>
+                            <bufferAttribute
+                                attach="attributes-position"
+                                count={points.length}
+                                array={new Float32Array(points.flatMap(v => [v.x, v.y, v.z]))}
+                                itemSize={3}
+                            />
+                        </bufferGeometry>
+                        <lineBasicMaterial color="#444444" opacity={0.3} transparent />
+                    </line>
+                );
+            })}
+        </>
+    );
+}
+
+function CityMarker({ city, radius }: { city: CityData; radius: number }) {
     const position = useMemo(() => latLongToVector3(city.lat, city.lng, radius), [city, radius]);
     const [hovered, setHovered] = useState(false);
 
     return (
         <group position={position}>
             <mesh
-                onClick={() => onSelect(city)}
                 onPointerOver={() => setHovered(true)}
                 onPointerOut={() => setHovered(false)}
             >
-                <sphereGeometry args={[hovered ? 0.04 : 0.025, 16, 16]} />
-                <meshBasicMaterial color={hovered ? "#ffffff" : "#888888"} />
-            </mesh>
-            {/* Pulsing ring */}
-            <mesh scale={[1.5, 1.5, 1.5]} rotation={[Math.PI / 2, 0, 0]}>
-                <ringGeometry args={[0.03, 0.04, 32]} />
-                <meshBasicMaterial color="#aaaaaa" opacity={0.4} transparent side={THREE.DoubleSide} />
+                <sphereGeometry args={[hovered ? 0.035 : 0.025, 12, 12]} />
+                <meshBasicMaterial color={hovered ? "#ff6b6b" : "#ffa500"} />
             </mesh>
 
             {hovered && (
-                <Html distanceFactor={10}>
-                    <div className="bg-black/90 text-white px-3 py-2 rounded-lg text-xs whitespace-nowrap border border-white/20 backdrop-blur-md shadow-xl">
+                <Html distanceFactor={8}>
+                    <div className="bg-black/95 text-white px-3 py-2 rounded-lg text-xs whitespace-nowrap border border-white/30">
                         <div className="font-bold">{city.name}</div>
                         <div className="text-gray-400 text-[10px]">{city.country}</div>
                     </div>
@@ -89,9 +148,10 @@ function CityMarker({ city, radius, onSelect }: { city: CityData; radius: number
     );
 }
 
-function RotatingEarthGroup() {
+function RotatingEarth() {
     const groupRef = useRef<THREE.Group>(null);
-    const { cities, allCities } = useWorldTime();
+    const { allCities } = useWorldTime();
+    const EARTH_RADIUS = 2.5;
 
     useFrame(() => {
         if (groupRef.current) {
@@ -99,96 +159,52 @@ function RotatingEarthGroup() {
         }
     });
 
-    const handleCitySelect = (city: CityData) => {
-        console.log("Selected", city.name);
-    };
-
-    // Show all cities on globe but limit to prevent performance issues  
-    const displayCities = allCities;
-
     return (
         <group ref={groupRef}>
-            {/* Earth Sphere */}
-            <mesh scale={[2.5, 2.5, 2.5]}>
-                <sphereGeometry args={[1, 64, 64]} />
+            {/* Ocean Sphere */}
+            <mesh>
+                <sphereGeometry args={[EARTH_RADIUS, 64, 64]} />
                 <meshStandardMaterial
-                    color="#0a0a0a"
-                    roughness={0.9}
-                    metalness={0.1}
+                    color="#0d1b2a"
+                    roughness={0.8}
+                    metalness={0.2}
                 />
             </mesh>
 
             {/* Continent Outlines */}
-            <ContinentLines radius={2.5} />
+            <ContinentLines radius={EARTH_RADIUS} />
 
-            {/* Longitude/Latitude Grid */}
-            {Array.from({ length: 12 }).map((_, i) => {
-                const angle = (i / 12) * Math.PI * 2;
-                const points = Array.from({ length: 50 }).map((_, j) => {
-                    const lat = (j / 50) * 180 - 90;
-                    const lng = (angle * 180) / Math.PI;
-                    const vec = latLongToVector3(lat, lng, 2.51);
-                    return new THREE.Vector3(vec[0], vec[1], vec[2]);
-                });
-
-                return (
-                    <Line
-                        key={`meridian-${i}`}
-                        points={points}
-                        color="#222222"
-                        lineWidth={0.5}
-                        transparent
-                        opacity={0.3}
-                    />
-                );
-            })}
-
-            {Array.from({ length: 6 }).map((_, i) => {
-                const lat = (i / 6) * 180 - 90;
-                const points = Array.from({ length: 72 }).map((_, j) => {
-                    const lng = (j / 72) * 360 - 180;
-                    const vec = latLongToVector3(lat, lng, 2.51);
-                    return new THREE.Vector3(vec[0], vec[1], vec[2]);
-                });
-
-                return (
-                    <Line
-                        key={`parallel-${i}`}
-                        points={points}
-                        color="#222222"
-                        lineWidth={0.5}
-                        transparent
-                        opacity={0.3}
-                    />
-                );
-            })}
+            {/* Grid Lines */}
+            <GridLines radius={EARTH_RADIUS} />
 
             {/* City Markers */}
-            {displayCities.map(city => (
-                <CityMarker key={city.id} city={city} radius={2.55} onSelect={handleCitySelect} />
+            {allCities.map(city => (
+                <CityMarker key={city.id} city={city} radius={EARTH_RADIUS + 0.03} />
             ))}
         </group>
-    )
+    );
 }
 
 export function Globe() {
     return (
         <div className="w-full h-full min-h-[500px] relative bg-black">
-            <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
-                <fog attach="fog" args={['#000', 5, 20]} />
+            <Canvas camera={{ position: [0, 0, 7], fov: 50 }}>
+                <color attach="background" args={['#000000']} />
+                <fog attach="fog" args={['#000000', 10, 25]} />
+
                 <ambientLight intensity={0.4} />
-                <directionalLight position={[5, 3, 5]} intensity={1.2} />
-                <directionalLight position={[-3, -2, -3]} intensity={0.3} />
+                <directionalLight position={[10, 5, 5]} intensity={1.2} />
+                <directionalLight position={[-5, -3, -5]} intensity={0.3} />
 
-                <Stars radius={100} depth={50} count={7000} factor={4} saturation={0} fade speed={0.5} />
+                <Stars radius={100} depth={60} count={5000} factor={4} saturation={0} fade speed={0.5} />
 
-                <RotatingEarthGroup />
+                <RotatingEarth />
 
                 <OrbitControls
                     enableZoom={true}
                     enablePan={false}
-                    minDistance={4}
-                    maxDistance={15}
+                    minDistance={3.5}
+                    maxDistance={12}
                     autoRotate={false}
                 />
             </Canvas>
