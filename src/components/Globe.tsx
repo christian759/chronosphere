@@ -1,6 +1,6 @@
 import { useRef, useMemo, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Stars, Html } from '@react-three/drei';
+import { OrbitControls, Stars, Html, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { useWorldTime, type CityData } from '../hooks/useWorldTime';
 import { latLongToVector3 } from '../utils/coordinates';
@@ -47,22 +47,18 @@ function ContinentLines({ radius }: { radius: number }) {
         <>
             {Object.entries(CONTINENTS).map(([name, points]) => {
                 const vertices = points.map(([lng, lat]) => {
-                    const vec = latLongToVector3(lat, lng, radius + 0.01);
-                    return new THREE.Vector3(vec[0], vec[1], vec[2]);
+                    return latLongToVector3(lat, lng, radius + 0.01);
                 });
 
                 return (
-                    <line key={name}>
-                        <bufferGeometry>
-                            <bufferAttribute
-                                attach="attributes-position"
-                                count={vertices.length}
-                                array={new Float32Array(vertices.flatMap(v => [v.x, v.y, v.z]))}
-                                itemSize={3}
-                            />
-                        </bufferGeometry>
-                        <lineBasicMaterial color="#4a7c2e" linewidth={2} />
-                    </line>
+                    <Line
+                        key={name}
+                        points={vertices}
+                        color="#4a7c2e"
+                        lineWidth={2}
+                        transparent
+                        opacity={0.8}
+                    />
                 );
             })}
         </>
@@ -76,22 +72,18 @@ function GridLines({ radius }: { radius: number }) {
             {[-60, -30, 0, 30, 60].map((lat) => {
                 const points = Array.from({ length: 73 }).map((_, i) => {
                     const lng = i * 5 - 180;
-                    const vec = latLongToVector3(lat, lng, radius + 0.002);
-                    return new THREE.Vector3(vec[0], vec[1], vec[2]);
+                    return latLongToVector3(lat, lng, radius + 0.002);
                 });
 
                 return (
-                    <line key={`lat-${lat}`}>
-                        <bufferGeometry>
-                            <bufferAttribute
-                                attach="attributes-position"
-                                count={points.length}
-                                array={new Float32Array(points.flatMap(v => [v.x, v.y, v.z]))}
-                                itemSize={3}
-                            />
-                        </bufferGeometry>
-                        <lineBasicMaterial color="#444444" opacity={0.3} transparent />
-                    </line>
+                    <Line
+                        key={`lat-${lat}`}
+                        points={points}
+                        color="#444444"
+                        lineWidth={0.5}
+                        transparent
+                        opacity={0.3}
+                    />
                 );
             })}
 
@@ -100,22 +92,18 @@ function GridLines({ radius }: { radius: number }) {
                 const lng = i * 30 - 180;
                 const points = Array.from({ length: 37 }).map((_, j) => {
                     const lat = j * 5 - 90;
-                    const vec = latLongToVector3(lat, lng, radius + 0.002);
-                    return new THREE.Vector3(vec[0], vec[1], vec[2]);
+                    return latLongToVector3(lat, lng, radius + 0.002);
                 });
 
                 return (
-                    <line key={`lng-${lng}`}>
-                        <bufferGeometry>
-                            <bufferAttribute
-                                attach="attributes-position"
-                                count={points.length}
-                                array={new Float32Array(points.flatMap(v => [v.x, v.y, v.z]))}
-                                itemSize={3}
-                            />
-                        </bufferGeometry>
-                        <lineBasicMaterial color="#444444" opacity={0.3} transparent />
-                    </line>
+                    <Line
+                        key={`lng-${lng}`}
+                        points={points}
+                        color="#444444"
+                        lineWidth={0.5}
+                        transparent
+                        opacity={0.3}
+                    />
                 );
             })}
         </>

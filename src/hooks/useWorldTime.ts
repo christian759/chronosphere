@@ -11,7 +11,12 @@ export function useWorldTime() {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem(FAVORITES_STORAGE_KEY);
             if (saved) {
-                return JSON.parse(saved);
+                try {
+                    return JSON.parse(saved);
+                } catch (e) {
+                    console.error('Failed to parse favorites from localStorage', e);
+                    return ['new-york', 'london', 'tokyo'];
+                }
             }
         }
         // Default favorites

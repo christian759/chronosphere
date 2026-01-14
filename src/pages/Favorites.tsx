@@ -31,7 +31,7 @@ export function Favorites() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-4xl font-display font-bold text-gray-900 dark: text-white">
+                    <h1 className="text-4xl font-display font-bold text-gray-900 dark:text-white">
                         My World Clocks
                     </h1>
                     <p className="text-gray-600 dark:text-gray-400 mt-2">
@@ -129,8 +129,8 @@ export function Favorites() {
                                                     onClick={() => !isAdded && handleAddCity(city.id)}
                                                     disabled={isAdded}
                                                     className={`w-full p-4 rounded-lg border transition-all text-left ${isAdded
-                                                            ? 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 opacity-50 cursor-not-allowed'
-                                                            : 'bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-md'
+                                                        ? 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 opacity-50 cursor-not-allowed'
+                                                        : 'bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-md'
                                                         }`}
                                                 >
                                                     <div className="flex items-center justify-between">
