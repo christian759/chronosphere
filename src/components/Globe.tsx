@@ -1,9 +1,8 @@
 import { useRef, useMemo, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Stars, Html } from '@react-three/drei';
 import * as THREE from 'three';
-import { useTheme } from '../hooks/useTheme';
-import { useWorldTime, CityData } from '../hooks/useWorldTime';
+import { useWorldTime, type CityData } from '../hooks/useWorldTime';
 import { getSunPosition } from '../utils/sunPosition';
 import { useEarthTextures } from '../hooks/useEarthTextures';
 import { latLongToVector3 } from '../utils/coordinates';
@@ -90,47 +89,6 @@ function CityMarker({ city, radius, onSelect }: { city: CityData; radius: number
     );
 }
 
-function GlobeMesh() {
-    const meshRef = useRef<THREE.Mesh>(null);
-    const materialRef = useRef<THREE.ShaderMaterial>(null);
-    const { utc, cities } = useWorldTime();
-    const { day, night, clouds } = useEarthTextures();
-
-    useFrame(() => {
-        if (materialRef.current) {
-            const sunPos = getSunPosition(utc);
-            materialRef.current.uniforms.sunPosition.value.copy(sunPos);
-        }
-        // Slowly rotate earth
-        if (meshRef.current) {
-            meshRef.current.rotation.y += 0.0005;
-        }
-    });
-
-    return (
-        <group>
-            {/* Earth Sphere */}
-            <mesh ref={meshRef} scale={[2.5, 2.5, 2.5]}>
-                <sphereGeometry args={[1, 64, 64]} />
-                <shaderMaterial
-                    ref={materialRef}
-                    args={[EarthMaterial]}
-                    uniforms-dayTexture-value={day}
-                    uniforms-nightTexture-value={night}
-                    uniforms-cloudTexture-value={clouds}
-                />
-            </mesh>
-
-            {/* Markers are children of the group but NOT the rotating mesh if we want them static relative to earth? 
-              Wait, if earth rotates, markers MUST rotate with it. 
-              So markers should be children of meshRef inside a group?
-              No, meshRef is the sphere. 
-              Let's Wrap Sphere + Markers in a Group that rotates.
-          */}
-        </group>
-    );
-}
-
 function RotatingEarthGroup() {
     const groupRef = useRef<THREE.Group>(null);
     const materialRef = useRef<THREE.ShaderMaterial>(null);
@@ -177,8 +135,6 @@ function RotatingEarthGroup() {
 }
 
 export function Globe() {
-    const { theme } = useTheme();
-
     return (
         <div className="w-full h-full min-h-[500px] relative bg-black">
             <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>

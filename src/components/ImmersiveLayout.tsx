@@ -1,6 +1,6 @@
-import { ReactNode, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Search, Clock, Menu } from 'lucide-react';
+import { type ReactNode, useState } from 'react';
+import { motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight, Search, Clock } from 'lucide-react';
 import { ClockCard } from '../components/ClockCard';
 import { useWorldTime } from '../hooks/useWorldTime';
 
