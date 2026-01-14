@@ -88,9 +88,9 @@ function CityMarker({ city, radius }: { city: CityData; radius: number }) {
 
             {hovered && (
                 <Html distanceFactor={8}>
-                    <div className="bg-black/90 backdrop-blur-md text-white px-3 py-2 rounded-lg text-xs whitespace-nowrap border border-cyan-500/30 shadow-lg">
-                        <div className="font-bold">{city.name}</div>
-                        <div className="text-cyan-400 text-[10px] tracking-wider uppercase">{city.country}</div>
+                    <div className="bg-black/95 backdrop-blur-md text-white px-3 py-2 rounded-lg text-xs whitespace-nowrap border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+                        <div className="font-bold tracking-tight">{city.name}</div>
+                        <div className="text-gray-400 text-[10px] tracking-wider uppercase">{city.country}</div>
                     </div>
                 </Html>
             )}

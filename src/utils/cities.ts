@@ -19,6 +19,12 @@ export const WORLD_CITIES: CityData[] = [
     { id: 'guatemala-city', name: 'Guatemala City', country: 'Guatemala', timezone: 'America/Guatemala', lat: 14.6133, lng: -90.5353, continent: 'North America' },
     { id: 'panama-city', name: 'Panama City', country: 'Panama', timezone: 'America/Panama', lat: 8.9833, lng: -79.5167, continent: 'North America' },
     { id: 'san-jose-cr', name: 'San José', country: 'Costa Rica', timezone: 'America/Costa_Rica', lat: 9.9281, lng: -84.0907, continent: 'North America' },
+    { id: 'ottawa', name: 'Ottawa', country: 'Canada', timezone: 'America/Toronto', lat: 45.4215, lng: -75.6972, continent: 'North America' },
+    { id: 'vancouver', name: 'Vancouver', country: 'Canada', timezone: 'America/Vancouver', lat: 49.2827, lng: -123.1207, continent: 'North America' },
+    { id: 'chicago', name: 'Chicago', country: 'United States', timezone: 'America/Chicago', lat: 41.8781, lng: -87.6298, continent: 'North America' },
+    { id: 'miami', name: 'Miami', country: 'United States', timezone: 'America/New_York', lat: 25.7617, lng: -80.1918, continent: 'North America' },
+    { id: 'washington', name: 'Washington D.C.', country: 'United States', timezone: 'America/New_York', lat: 38.9072, lng: -77.0369, continent: 'North America' },
+    { id: 'kingston', name: 'Kingston', country: 'Jamaica', timezone: 'America/Jamaica', lat: 17.9714, lng: -76.7936, continent: 'North America' },
 
     // South America
     { id: 'sao-paulo', name: 'São Paulo', country: 'Brazil', timezone: 'America/Sao_Paulo', lat: -23.5505, lng: -46.6333, population: 12325000, continent: 'South America' },
@@ -31,6 +37,10 @@ export const WORLD_CITIES: CityData[] = [
     { id: 'montevideo', name: 'Montevideo', country: 'Uruguay', timezone: 'America/Montevideo', lat: -34.9011, lng: -56.1645, continent: 'South America' },
     { id: 'asuncion', name: 'Asunción', country: 'Paraguay', timezone: 'America/Asuncion', lat: -25.2637, lng: -57.5759, continent: 'South America' },
     { id: 'la-paz', name: 'La Paz', country: 'Bolivia', timezone: 'America/La_Paz', lat: -16.4897, lng: -68.1193, continent: 'South America' },
+    { id: 'brasilia', name: 'Brasília', country: 'Brazil', timezone: 'America/Sao_Paulo', lat: -15.7801, lng: -47.9292, continent: 'South America' },
+    { id: 'rio-de-janeiro', name: 'Rio de Janeiro', country: 'Brazil', timezone: 'America/Sao_Paulo', lat: -22.9068, lng: -43.1729, continent: 'South America' },
+    { id: 'georgetown-gy', name: 'Georgetown', country: 'Guyana', timezone: 'America/Guyana', lat: 6.8013, lng: -58.1551, continent: 'South America' },
+    { id: 'paramaribo', name: 'Paramaribo', country: 'Suriname', timezone: 'America/Paramaribo', lat: 5.8520, lng: -55.2038, continent: 'South America' },
 
     // Europe
     { id: 'london', name: 'London', country: 'United Kingdom', timezone: 'Europe/London', lat: 51.5074, lng: -0.1278, population: 8982000, continent: 'Europe' },
@@ -53,6 +63,11 @@ export const WORLD_CITIES: CityData[] = [
     { id: 'kiev', name: 'Kyiv', country: 'Ukraine', timezone: 'Europe/Kyiv', lat: 50.4501, lng: 30.5234, continent: 'Europe' },
     { id: 'budapest', name: 'Budapest', country: 'Hungary', timezone: 'Europe/Budapest', lat: 47.4979, lng: 19.0402, continent: 'Europe' },
     { id: 'prague', name: 'Prague', country: 'Czech Republic', timezone: 'Europe/Prague', lat: 50.0755, lng: 14.4378, continent: 'Europe' },
+    { id: 'amsterdam', name: 'Amsterdam', country: 'Netherlands', timezone: 'Europe/Amsterdam', lat: 52.3676, lng: 4.9041, continent: 'Europe' },
+    { id: 'zurich', name: 'Zurich', country: 'Switzerland', timezone: 'Europe/Zurich', lat: 47.3769, lng: 8.5417, continent: 'Europe' },
+    { id: 'istanbul', name: 'Istanbul', country: 'Turkey', timezone: 'Europe/Istanbul', lat: 41.0082, lng: 28.9784, continent: 'Europe' },
+    { id: 'bucharest', name: 'Bucharest', country: 'Romania', timezone: 'Europe/Bucharest', lat: 44.4268, lng: 26.1025, continent: 'Europe' },
+    { id: 'prague-cz', name: 'Prague', country: 'Czechia', timezone: 'Europe/Prague', lat: 50.0755, lng: 14.4378, continent: 'Europe' },
 
     // Asia
     { id: 'tokyo', name: 'Tokyo', country: 'Japan', timezone: 'Asia/Tokyo', lat: 35.6762, lng: 139.6503, population: 13960000, continent: 'Asia' },
@@ -73,6 +88,13 @@ export const WORLD_CITIES: CityData[] = [
     { id: 'tel-aviv', name: 'Tel Aviv', country: 'Israel', timezone: 'Asia/Tel_Aviv', lat: 32.0853, lng: 34.7818, continent: 'Asia' },
     { id: 'hanoi', name: 'Hanoi', country: 'Vietnam', timezone: 'Asia/Ho_Chi_Minh', lat: 21.0285, lng: 105.8542, continent: 'Asia' },
     { id: 'kuala-lumpur', name: 'Kuala Lumpur', country: 'Malaysia', timezone: 'Asia/Kuala_Lumpur', lat: 3.1390, lng: 101.6869, continent: 'Asia' },
+    { id: 'hong-kong', name: 'Hong Kong', country: 'China', timezone: 'Asia/Hong_Kong', lat: 22.3193, lng: 114.1694, continent: 'Asia' },
+    { id: 'taipei', name: 'Taipei', country: 'Taiwan', timezone: 'Asia/Taipei', lat: 25.0330, lng: 121.5654, continent: 'Asia' },
+    { id: 'baghdad', name: 'Baghdad', country: 'Iraq', timezone: 'Asia/Baghdad', lat: 33.3152, lng: 44.3661, continent: 'Asia' },
+    { id: 'tashkent', name: 'Tashkent', country: 'Uzbekistan', timezone: 'Asia/Tashkent', lat: 41.2995, lng: 69.2401, continent: 'Asia' },
+    { id: 'astana', name: 'Astana', country: 'Kazakhstan', timezone: 'Asia/Almaty', lat: 51.1605, lng: 71.4704, continent: 'Asia' },
+    { id: 'kathmandu', name: 'Kathmandu', country: 'Nepal', timezone: 'Asia/Kathmandu', lat: 27.7172, lng: 85.3240, continent: 'Asia' },
+    { id: 'colombo', name: 'Colombo', country: 'Sri Lanka', timezone: 'Asia/Colombo', lat: 6.9271, lng: 79.8612, continent: 'Asia' },
 
     // Africa
     { id: 'cairo', name: 'Cairo', country: 'Egypt', timezone: 'Africa/Cairo', lat: 30.0444, lng: 31.2357, continent: 'Africa' },
@@ -87,6 +109,11 @@ export const WORLD_CITIES: CityData[] = [
     { id: 'dar-es-salaam', name: 'Dar es Salaam', country: 'Tanzania', timezone: 'Africa/Dar_es_Salaam', lat: -6.7924, lng: 39.2083, continent: 'Africa' },
     { id: 'luanda', name: 'Luanda', country: 'Angola', timezone: 'Africa/Luanda', lat: -8.8390, lng: 13.2343, continent: 'Africa' },
     { id: 'khartoum', name: 'Khartoum', country: 'Sudan', timezone: 'Africa/Khartoum', lat: 15.5007, lng: 32.5599, continent: 'Africa' },
+    { id: 'abidjan', name: 'Abidjan', country: "Côte d'Ivoire", timezone: 'Africa/Abidjan', lat: 5.3600, lng: -4.0083, continent: 'Africa' },
+    { id: 'kampala', name: 'Kampala', country: 'Uganda', timezone: 'Africa/Kampala', lat: 0.3476, lng: 32.5825, continent: 'Africa' },
+    { id: 'tunis', name: 'Tunis', country: 'Tunisia', timezone: 'Africa/Tunis', lat: 36.8065, lng: 10.1815, continent: 'Africa' },
+    { id: 'antananarivo', name: 'Antananarivo', country: 'Madagascar', timezone: 'Indian/Antananarivo', lat: -18.8792, lng: 47.5079, continent: 'Africa' },
+    { id: 'kinshasa', name: 'Kinshasa', country: 'DR Congo', timezone: 'Africa/Kinshasa', lat: -4.4419, lng: 15.2663, continent: 'Africa' },
 
     // Oceania
     { id: 'sydney', name: 'Sydney', country: 'Australia', timezone: 'Australia/Sydney', lat: -33.8688, lng: 151.2093, continent: 'Oceania' },
@@ -95,6 +122,9 @@ export const WORLD_CITIES: CityData[] = [
     { id: 'perth', name: 'Perth', country: 'Australia', timezone: 'Australia/Perth', lat: -31.9505, lng: 115.8605, continent: 'Oceania' },
     { id: 'suva', name: 'Suva', country: 'Fiji', timezone: 'Pacific/Fiji', lat: -18.1248, lng: 178.4501, continent: 'Oceania' },
     { id: 'port-moresby', name: 'Port Moresby', country: 'Papua New Guinea', timezone: 'Pacific/Port_Moresby', lat: -9.4431, lng: 147.1803, continent: 'Oceania' },
+    { id: 'brisbane', name: 'Brisbane', country: 'Australia', timezone: 'Australia/Brisbane', lat: -27.4698, lng: 153.0251, continent: 'Oceania' },
+    { id: 'honolulu', name: 'Honolulu', country: 'United States', timezone: 'Pacific/Honolulu', lat: 21.3069, lng: -157.8583, continent: 'Oceania' },
+    { id: 'noumea', name: 'Noumea', country: 'New Caledonia', timezone: 'Pacific/Noumea', lat: -22.2735, lng: 166.4468, continent: 'Oceania' },
 ];
 
 export function searchCities(query: string): CityData[] {

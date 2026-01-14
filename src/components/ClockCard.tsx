@@ -6,9 +6,10 @@ import { useState } from 'react';
 interface ClockCardProps {
     city: CityData;
     onRemove?: () => void;
+    variant?: 'default' | 'compact';
 }
 
-export function ClockCard({ city, onRemove }: ClockCardProps) {
+export function ClockCard({ city, onRemove, variant = 'default' }: ClockCardProps) {
     const { getFormattedTime, getFormattedDate } = useWorldTime();
     const [showRemove, setShowRemove] = useState(false);
     const timeStr = getFormattedTime(city.timezone);
@@ -21,12 +22,14 @@ export function ClockCard({ city, onRemove }: ClockCardProps) {
         return pop.toString();
     };
 
+    const isCompact = variant === 'compact';
+
     return (
         <motion.div
-            whileHover={{ scale: 1.02, y: -5 }}
+            whileHover={{ scale: 1.02, y: isCompact ? -2 : -5 }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="relative p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden group cursor-pointer"
+            className={`relative rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden group cursor-pointer ${isCompact ? 'p-3' : 'p-6'}`}
             onMouseEnter={() => setShowRemove(true)}
             onMouseLeave={() => setShowRemove(false)}
         >
@@ -34,7 +37,7 @@ export function ClockCard({ city, onRemove }: ClockCardProps) {
             <div className="absolute inset-0 bg-gradient-to-br from-gray-500/5 to-gray-300/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
             {/* Glow Effect */}
-            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-gray-700 via-gray-500 to-gray-400 opacity-0 group-hover:opacity-10 blur-lg transition duration-500 group-hover:duration-200" />
+            <div className={`absolute -inset-1 rounded-2xl bg-gradient-to-r from-gray-700 via-gray-500 to-gray-400 opacity-0 group-hover:opacity-10 blur-lg transition duration-500 group-hover:duration-200`} />
 
             {/* Remove Button */}
             {onRemove && (
@@ -45,48 +48,50 @@ export function ClockCard({ city, onRemove }: ClockCardProps) {
                         e.stopPropagation();
                         onRemove();
                     }}
-                    className="absolute top-3 right-3 z-20 p-1.5 bg-red-500 hover:bg-red-600 rounded-full transition-colors"
+                    className={`absolute z-20 bg-red-500 hover:bg-red-600 rounded-full transition-colors ${isCompact ? 'top-2 right-2 p-1' : 'top-3 right-3 p-1.5'}`}
                     title="Remove city"
                 >
-                    <X size={14} className="text-white" />
+                    <X size={isCompact ? 10 : 14} className="text-white" />
                 </motion.button>
             )}
 
             <div className="relative z-10 flex flex-col">
                 {/* City Header */}
-                <div className="flex items-start justify-between mb-4">
+                <div className={`flex items-start justify-between ${isCompact ? 'mb-2' : 'mb-4'}`}>
                     <div className="flex items-center gap-2">
-                        <MapPin size={16} className="text-gray-600 dark:text-gray-400" />
+                        <MapPin size={isCompact ? 12 : 16} className="text-gray-600 dark:text-gray-400" />
                         <div>
-                            <h3 className="font-bold text-lg text-gray-900 dark:text-white">
+                            <h3 className={`font-bold text-gray-900 dark:text-white ${isCompact ? 'text-sm' : 'text-lg'}`}>
                                 {city.name}
                             </h3>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">
-                                {city.country}
-                            </p>
+                            {!isCompact && (
+                                <p className="text-xs text-gray-600 dark:text-gray-400">
+                                    {city.country}
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>
 
                 {/* Time Display */}
-                <div className="text-center mb-4">
+                <div className={`text-center ${isCompact ? 'mb-2' : 'mb-4'}`}>
                     <div className="flex items-center justify-center gap-2 mb-1">
-                        <Clock size={18} className="text-gray-600 dark:text-gray-400" />
-                        <div className="text-4xl md:text-5xl font-bold font-mono text-gray-800 dark:text-white tracking-tight">
+                        {!isCompact && <Clock size={18} className="text-gray-600 dark:text-gray-400" />}
+                        <div className={`font-bold font-mono text-gray-800 dark:text-white tracking-tight ${isCompact ? 'text-2xl' : 'text-4xl md:text-5xl'}`}>
                             {timeStr}
                         </div>
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className={`text-gray-600 dark:text-gray-400 ${isCompact ? 'text-[10px]' : 'text-sm'}`}>
                         {dateStr}
                     </div>
                 </div>
 
                 {/* City Details */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <div className="text-xs text-gray-500 dark:text-gray-500 font-mono">
+                <div className={`flex items-center justify-between border-t border-gray-200 dark:border-gray-700 ${isCompact ? 'pt-2' : 'pt-4'}`}>
+                    <div className={`text-gray-500 dark:text-gray-500 font-mono ${isCompact ? 'text-[9px]' : 'text-xs'}`}>
                         {city.timezone}
                     </div>
-                    {city.population && (
+                    {city.population && !isCompact && (
                         <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
                             <Users size={12} />
                             {formatPopulation(city.population)}
