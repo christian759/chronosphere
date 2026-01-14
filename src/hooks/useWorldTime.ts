@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { toZonedTime, format } from 'date-fns-tz';
 
 export type CityKey = 'GMT' | 'NYC' | 'LON' | 'TYO' | 'SYD' | 'PAR' | 'DUB';
 
@@ -44,9 +43,8 @@ export function useWorldTime() {
         return new Date(time.toLocaleString('en-US', { timeZone: timezone }));
     };
 
-    const getFormattedTime = (timezone: string, fmt: string = 'HH:mm:ss') => {
+    const getFormattedTime = (timezone: string) => {
         // Just a placeholder wrapper
-        const cityTime = getCityTime(timezone);
         // use simple formatting or date-fns format if available. 
         // I'll implement a simple one for now or use date-fns if imported.
         // Since I installed date-fns, I can use it.

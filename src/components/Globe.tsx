@@ -1,6 +1,6 @@
 import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Stars, Html } from '@react-three/drei';
+import { OrbitControls, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { useTheme } from '../hooks/useTheme';
 
@@ -9,7 +9,7 @@ function GlobeMesh() {
     const { theme } = useTheme();
 
     // Rotate the globe
-    useFrame((state) => {
+    useFrame(() => {
         if (globeRef.current) {
             globeRef.current.rotation.y += 0.001;
         }

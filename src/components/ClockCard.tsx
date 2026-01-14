@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useWorldTime, CityData } from '../hooks/useWorldTime';
+import { useWorldTime, type CityData } from '../hooks/useWorldTime';
 import { Clock } from 'lucide-react';
 
 interface ClockCardProps {
@@ -9,7 +9,6 @@ interface ClockCardProps {
 export function ClockCard({ city }: ClockCardProps) {
     const { getFormattedTime } = useWorldTime();
     const timeStr = getFormattedTime(city.timezone);
-    const [hours, minutes] = timeStr.split(':');
 
     return (
         <motion.div
