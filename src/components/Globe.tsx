@@ -1,80 +1,201 @@
-import { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Stars } from '@react-three/drei';
+import { useRef, useMemo, useState } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { OrbitControls, Stars, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { useTheme } from '../hooks/useTheme';
+import { useWorldTime, CityData } from '../hooks/useWorldTime';
+import { getSunPosition } from '../utils/sunPosition';
+import { useEarthTextures } from '../hooks/useEarthTextures';
+import { latLongToVector3 } from '../utils/coordinates';
+
+// Custom Shader Material remains the same...
+const EarthMaterial = {
+    uniforms: {
+        sunPosition: { value: new THREE.Vector3(0, 0, 10) },
+        dayTexture: { value: null },
+        nightTexture: { value: null },
+        cloudTexture: { value: null },
+    },
+    vertexShader: `
+    varying vec2 vUv;
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+
+    void main() {
+      vUv = uv;
+      vNormal = normalize(normalMatrix * normal);
+      vPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+    fragmentShader: `
+    uniform vec3 sunPosition;
+    uniform sampler2D dayTexture;
+    uniform sampler2D nightTexture;
+    uniform sampler2D cloudTexture;
+    
+    varying vec2 vUv;
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+
+    void main() {
+      vec3 sunDir = normalize(sunPosition);
+      float intensity = dot(vNormal, sunDir);
+      float mixFactor = smoothstep(-0.2, 0.2, intensity);
+      
+      vec4 dayColor = texture2D(dayTexture, vUv);
+      vec4 nightColor = texture2D(nightTexture, vUv);
+      vec4 clouds = texture2D(cloudTexture, vUv);
+
+      vec3 finalColor = mix(nightColor.rgb, dayColor.rgb, mixFactor);
+      finalColor = mix(finalColor, vec3(1.0), clouds.r * 0.4);
+      
+      if (mixFactor < 0.5) {
+          finalColor = mix(finalColor, vec3(0.0), clouds.r * 0.8 * (1.0 - mixFactor)); 
+      }
+
+      gl_FragColor = vec4(finalColor, 1.0);
+    }
+  `
+};
+
+function CityMarker({ city, radius, onSelect }: { city: CityData; radius: number; onSelect: (c: CityData) => void }) {
+    const position = useMemo(() => latLongToVector3(city.lat, city.lng, radius), [city, radius]);
+    const [hovered, setHovered] = useState(false);
+
+    return (
+        <group position={position}>
+            <mesh
+                onClick={() => onSelect(city)}
+                onPointerOver={() => setHovered(true)}
+                onPointerOut={() => setHovered(false)}
+            >
+                <sphereGeometry args={[hovered ? 0.05 : 0.03, 16, 16]} />
+                <meshBasicMaterial color={hovered ? "#00ffff" : "#ff00ff"} />
+            </mesh>
+            {/* Pulsing ring */}
+            <mesh scale={[1.5, 1.5, 1.5]}>
+                <ringGeometry args={[0.04, 0.05, 32]} />
+                <meshBasicMaterial color="#00ffff" opacity={0.5} transparent side={THREE.DoubleSide} />
+            </mesh>
+
+            {hovered && (
+                <Html distanceFactor={10}>
+                    <div className="bg-black/80 text-white p-2 rounded text-xs whitespace-nowrap border border-white/20 backdrop-blur-md">
+                        {city.name}
+                    </div>
+                </Html>
+            )}
+        </group>
+    );
+}
 
 function GlobeMesh() {
-    const globeRef = useRef<THREE.Mesh>(null);
-    const { theme } = useTheme();
+    const meshRef = useRef<THREE.Mesh>(null);
+    const materialRef = useRef<THREE.ShaderMaterial>(null);
+    const { utc, cities } = useWorldTime();
+    const { day, night, clouds } = useEarthTextures();
 
-    // Rotate the globe
     useFrame(() => {
-        if (globeRef.current) {
-            globeRef.current.rotation.y += 0.001;
+        if (materialRef.current) {
+            const sunPos = getSunPosition(utc);
+            materialRef.current.uniforms.sunPosition.value.copy(sunPos);
+        }
+        // Slowly rotate earth
+        if (meshRef.current) {
+            meshRef.current.rotation.y += 0.0005;
         }
     });
 
-    // Dynamic colors based on theme
-    const materialProps = useMemo(() => {
-        if (theme === 'cyberpunk') {
-            return { color: '#2a0a2a', emissive: '#110022', wireframe: true };
-        } else if (theme === 'futuristic') {
-            return { color: '#001133', emissive: '#001122', wireframe: false, metalness: 0.8, roughness: 0.2 };
-        } else if (theme === 'light') {
-            return { color: '#ddddff', emissive: '#ffffff', wireframe: false };
-        }
-        // Default Dark
-        return { color: '#1a237e', emissive: '#000022', wireframe: false };
-    }, [theme]);
-
-    // Points for cities (Demo: hardcoded points for now)
-    // Converting lat/long to 3D position is needed for real implementation
-    // x = r * cos(lat) * cos(lon)
-    // y = r * sin(lat)
-    // z = r * cos(lat) * sin(lon)
-
     return (
         <group>
-            <mesh ref={globeRef} scale={[2.5, 2.5, 2.5]}>
+            {/* Earth Sphere */}
+            <mesh ref={meshRef} scale={[2.5, 2.5, 2.5]}>
                 <sphereGeometry args={[1, 64, 64]} />
-                <meshStandardMaterial
-                    {...materialProps}
+                <shaderMaterial
+                    ref={materialRef}
+                    args={[EarthMaterial]}
+                    uniforms-dayTexture-value={day}
+                    uniforms-nightTexture-value={night}
+                    uniforms-cloudTexture-value={clouds}
                 />
             </mesh>
 
-            {/* Atmosphere Glow (Simulated with a slightly larger sphere) */}
-            <mesh scale={[2.6, 2.6, 2.6]}>
-                <sphereGeometry args={[1, 64, 64]} />
-                <meshStandardMaterial
-                    color={theme === 'cyberpunk' ? '#ff00ff' : '#4488ff'}
-                    transparent
-                    opacity={0.1}
-                    side={THREE.BackSide}
-                />
-            </mesh>
+            {/* Markers are children of the group but NOT the rotating mesh if we want them static relative to earth? 
+              Wait, if earth rotates, markers MUST rotate with it. 
+              So markers should be children of meshRef inside a group?
+              No, meshRef is the sphere. 
+              Let's Wrap Sphere + Markers in a Group that rotates.
+          */}
         </group>
     );
+}
+
+function RotatingEarthGroup() {
+    const groupRef = useRef<THREE.Group>(null);
+    const materialRef = useRef<THREE.ShaderMaterial>(null);
+    const { utc, cities } = useWorldTime();
+    const { day, night, clouds } = useEarthTextures();
+
+    useFrame(() => {
+        if (groupRef.current) {
+            groupRef.current.rotation.y += 0.0005;
+        }
+        if (materialRef.current) {
+            const sunPos = getSunPosition(utc);
+            // We need to inverse rotate the sun position if we are rotating the mesh?
+            // Actually, if the mesh rotates, the "Normal" rotates.
+            // The Sun is "fixed" in world space usually.
+            // If we rotate the object, the Normals rotate in World Space.
+            // So Dot(Normal, Sun) works fine if Sun is World Space.
+            materialRef.current.uniforms.sunPosition.value.copy(sunPos);
+        }
+    });
+
+    const handleCitySelect = (city: CityData) => {
+        console.log("Selected", city.name);
+        // Implement FlyTo logic here later
+    };
+
+    return (
+        <group ref={groupRef}>
+            <mesh scale={[2.5, 2.5, 2.5]}>
+                <sphereGeometry args={[1, 64, 64]} />
+                <shaderMaterial
+                    ref={materialRef}
+                    args={[EarthMaterial]}
+                    uniforms-dayTexture-value={day}
+                    uniforms-nightTexture-value={night}
+                    uniforms-cloudTexture-value={clouds}
+                />
+            </mesh>
+            {cities.map(city => (
+                <CityMarker key={city.id} city={city} radius={2.55} onSelect={handleCitySelect} />
+            ))}
+        </group>
+    )
 }
 
 export function Globe() {
     const { theme } = useTheme();
 
     return (
-        <div className="w-full h-full min-h-[500px] relative">
+        <div className="w-full h-full min-h-[500px] relative bg-black">
             <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
-                <ambientLight intensity={0.5} />
-                <pointLight position={[10, 10, 10]} intensity={1.5} color={theme === 'cyberpunk' ? '#ff00ff' : '#ffffff'} />
-                <pointLight position={[-10, -10, -10]} intensity={0.5} color="#00ffff" />
+                <fog attach="fog" args={['#000', 5, 20]} />
+                <ambientLight intensity={0.1} />
 
-                <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+                <Stars radius={100} depth={50} count={7000} factor={4} saturation={0} fade speed={0.5} />
 
-                <GlobeMesh />
-                <OrbitControls enableZoom={true} enablePan={false} minDistance={5} maxDistance={15} autoRotate autoRotateSpeed={0.5} />
+                <RotatingEarthGroup />
+
+                <OrbitControls
+                    enableZoom={true}
+                    enablePan={false}
+                    minDistance={4}
+                    maxDistance={20}
+                />
             </Canvas>
-            <div className="absolute bottom-4 right-4 text-xs text-white/50 pointer-events-none">
-                Interactive 3D View
-            </div>
         </div>
     );
 }
