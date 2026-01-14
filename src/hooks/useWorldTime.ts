@@ -1,26 +1,22 @@
 import { useState, useEffect } from 'react';
+import { WORLD_CITIES, searchCities, getCityById, type CityData } from '../utils/cities';
 
-export type CityKey = 'GMT' | 'NYC' | 'LON' | 'TYO' | 'SYD' | 'PAR' | 'DUB';
+const FAVORITES_STORAGE_KEY = 'chronosphere-favorites';
 
-export interface CityData {
-    id: string;
-    name: string;
-    timezone: string;
-    lat: number;
-    lng: number;
-}
-
-const CITIES: Record<string, CityData> = {
-    'NYC': { id: 'New York', name: 'New York', timezone: 'America/New_York', lat: 40.7128, lng: -74.0060 },
-    'LON': { id: 'London', name: 'London', timezone: 'Europe/London', lat: 51.5074, lng: -0.1278 },
-    'TYO': { id: 'Tokyo', name: 'Tokyo', timezone: 'Asia/Tokyo', lat: 35.6762, lng: 139.6503 },
-    'SYD': { id: 'Sydney', name: 'Sydney', timezone: 'Australia/Sydney', lat: -33.8688, lng: 151.2093 },
-    'PAR': { id: 'Paris', name: 'Paris', timezone: 'Europe/Paris', lat: 48.8566, lng: 2.3522 },
-    'DUB': { id: 'Dubai', name: 'Dubai', timezone: 'Asia/Dubai', lat: 25.2048, lng: 55.2708 },
-};
+export type { CityData };
 
 export function useWorldTime() {
     const [time, setTime] = useState(new Date());
+    const [favoriteCityIds, setFavoriteCityIds] = useState<string[]>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem(FAVORITES_STORAGE_KEY);
+            if (saved) {
+                return JSON.parse(saved);
+            }
+        }
+        // Default favorites
+        return ['new-york', 'london', 'tokyo'];
+    });
 
     useEffect(() => {
         // Update every second
@@ -31,26 +27,16 @@ export function useWorldTime() {
         return () => clearInterval(timer);
     }, []);
 
-    const getCityTime = (timezone: string) => {
-        // In date-fns v4 / modern JS, we use Intl or the new API
-        // but here we just use native Date with locale for simplicity if date-fns-tz is tricky to setup instantly
-        // Actually I installed date-fns, but not date-fns-tz.
-        // I should probably just use native Intl.DateTimeFormat for safety if I didn't install date-fns-tz
-        // Let's stick to Intl for zero-dep reliability on timezones if possible, OR just fake it for now.
-        // But user asked for "Complete advanced".
-        // I'll use Intl.
+    useEffect(() => {
+        // Save favorites to localStorage
+        localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favoriteCityIds));
+    }, [favoriteCityIds]);
 
+    const getCityTime = (timezone: string) => {
         return new Date(time.toLocaleString('en-US', { timeZone: timezone }));
     };
 
     const getFormattedTime = (timezone: string) => {
-        // Just a placeholder wrapper
-        // use simple formatting or date-fns format if available. 
-        // I'll implement a simple one for now or use date-fns if imported.
-        // Since I installed date-fns, I can use it.
-        // But wait I didn't install date-fns-tz. formatting a date object that is already shifted might be wrong if it keeps local offset.
-        // Better:
-
         return new Intl.DateTimeFormat('en-US', {
             timeZone: timezone,
             hour: '2-digit',
@@ -60,10 +46,44 @@ export function useWorldTime() {
         }).format(time);
     };
 
+    const getFormattedDate = (timezone: string) => {
+        return new Intl.DateTimeFormat('en-US', {
+            timeZone: timezone,
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        }).format(time);
+    };
+
+    const addFavorite = (cityId: string) => {
+        if (!favoriteCityIds.includes(cityId)) {
+            setFavoriteCityIds([...favoriteCityIds, cityId]);
+        }
+    };
+
+    const removeFavorite = (cityId: string) => {
+        setFavoriteCityIds(favoriteCityIds.filter(id => id !== cityId));
+    };
+
+    const isFavorite = (cityId: string) => {
+        return favoriteCityIds.includes(cityId);
+    };
+
+    const favoriteCities = favoriteCityIds
+        .map(id => getCityById(id))
+        .filter((city): city is CityData => city !== undefined);
+
     return {
         utc: time,
         getCityTime,
         getFormattedTime,
-        cities: Object.values(CITIES)
+        getFormattedDate,
+        cities: favoriteCities,
+        allCities: WORLD_CITIES,
+        searchCities,
+        addFavorite,
+        removeFavorite,
+        isFavorite,
     };
 }
