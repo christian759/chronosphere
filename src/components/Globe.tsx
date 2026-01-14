@@ -7,10 +7,10 @@ import { latLongToVector3 } from '../utils/coordinates';
 
 // Textures from Three.js examples / NASA
 const TEXTURES = {
-    day: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg',
+    day: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_day_4096.jpg',
     specular: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_specular_2048.jpg',
     normal: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_normal_2048.jpg',
-    clouds: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_clouds_2048.png',
+    clouds: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_clouds_1024.png',
 };
 
 function CountryBorders({ radius }: { radius: number }) {
@@ -183,8 +183,13 @@ function RotatingEarth() {
 
 export function Globe() {
     return (
-        <div className="w-full h-full min-h-[500px] relative bg-black">
-            <Suspense fallback={<div className="flex items-center justify-center w-full h-full text-white font-mono">LOADING EARTH_SYSTEM...</div>}>
+        <div className="w-full h-full min-h-[500px] relative bg-black overflow-hidden">
+            <Suspense fallback={
+                <div className="flex flex-col items-center justify-center w-full h-full text-white font-mono gap-4">
+                    <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+                    <div className="text-[10px] tracking-[0.3em] uppercase opacity-50 animate-pulse">CONNECTING_TO_CORE...</div>
+                </div>
+            }>
                 <Canvas camera={{ position: [0, 0, 7], fov: 50 }} shadows>
                     <color attach="background" args={['#000000']} />
 
