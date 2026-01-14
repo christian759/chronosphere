@@ -1,17 +1,18 @@
 import { Globe } from '../components/Globe';
+import { ImmersiveLayout } from '../components/ImmersiveLayout';
+import { useTheme } from '../hooks/useTheme';
 
 export function GlobePage() {
-    return (
-        <div className="h-[calc(100vh-100px)] w-full relative rounded-3xl overflow-hidden shadow-2xl border border-white/10">
-            <div className="absolute inset-0 bg-black/80 z-[-1]" />
-            <Globe />
+    const { setTheme } = useTheme();
 
-            <div className="absolute top-8 left-8 p-6 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 max-w-sm pointer-events-none">
-                <h2 className="text-2xl font-display font-bold text-white mb-2">Satellite View</h2>
-                <p className="text-sm text-gray-300">
-                    Interactive visualization of global timezones. Drag to rotate, scroll to zoom.
-                </p>
-            </div>
+    // Force immersive theme (dark/space) when entering
+    // In a real app we might respect user choice or have a "Cinematic Mode"
+
+    return (
+        <div className="w-full h-screen">
+            <ImmersiveLayout>
+                <Globe />
+            </ImmersiveLayout>
         </div>
     );
 }
