@@ -28,7 +28,7 @@ export function ThemeSwitcher() {
                     {theme === t.id && (
                         <motion.div
                             layoutId="activeTheme"
-                            className="absolute inset-0 bg-blue-500/80 dark:bg-blue-600/80 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.6)]"
+                            className="absolute inset-0 bg-gray-800/80 dark:bg-gray-200/80 rounded-full shadow-[0_0_10px_rgba(0,0,0,0.6)]"
                             transition={{ type: "spring", stiffness: 300, damping: 20 }}
                         />
                     )}

@@ -3,8 +3,6 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Stars, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { useWorldTime, type CityData } from '../hooks/useWorldTime';
-import { getSunPosition } from '../utils/sunPosition';
-import { useEarthTextures } from '../hooks/useEarthTextures';
 import { latLongToVector3 } from '../utils/coordinates';
 
 // Custom Shader Material remains the same...
@@ -70,12 +68,12 @@ function CityMarker({ city, radius, onSelect }: { city: CityData; radius: number
                 onPointerOut={() => setHovered(false)}
             >
                 <sphereGeometry args={[hovered ? 0.05 : 0.03, 16, 16]} />
-                <meshBasicMaterial color={hovered ? "#00ffff" : "#ff00ff"} />
+                <meshBasicMaterial color={hovered ? "#ffffff" : "#666666"} />
             </mesh>
             {/* Pulsing ring */}
             <mesh scale={[1.5, 1.5, 1.5]}>
                 <ringGeometry args={[0.04, 0.05, 32]} />
-                <meshBasicMaterial color="#00ffff" opacity={0.5} transparent side={THREE.DoubleSide} />
+                <meshBasicMaterial color="#999999" opacity={0.5} transparent side={THREE.DoubleSide} />
             </mesh>
 
             {hovered && (
@@ -89,24 +87,14 @@ function CityMarker({ city, radius, onSelect }: { city: CityData; radius: number
     );
 }
 
+
 function RotatingEarthGroup() {
     const groupRef = useRef<THREE.Group>(null);
-    const materialRef = useRef<THREE.ShaderMaterial>(null);
-    const { utc, cities } = useWorldTime();
-    const { day, night, clouds } = useEarthTextures();
+    const { cities } = useWorldTime();
 
     useFrame(() => {
         if (groupRef.current) {
             groupRef.current.rotation.y += 0.0005;
-        }
-        if (materialRef.current) {
-            const sunPos = getSunPosition(utc);
-            // We need to inverse rotate the sun position if we are rotating the mesh?
-            // Actually, if the mesh rotates, the "Normal" rotates.
-            // The Sun is "fixed" in world space usually.
-            // If we rotate the object, the Normals rotate in World Space.
-            // So Dot(Normal, Sun) works fine if Sun is World Space.
-            materialRef.current.uniforms.sunPosition.value.copy(sunPos);
         }
     });
 
@@ -119,12 +107,10 @@ function RotatingEarthGroup() {
         <group ref={groupRef}>
             <mesh scale={[2.5, 2.5, 2.5]}>
                 <sphereGeometry args={[1, 64, 64]} />
-                <shaderMaterial
-                    ref={materialRef}
-                    args={[EarthMaterial]}
-                    uniforms-dayTexture-value={day}
-                    uniforms-nightTexture-value={night}
-                    uniforms-cloudTexture-value={clouds}
+                <meshStandardMaterial
+                    color="#1a1a1a"
+                    roughness={0.8}
+                    metalness={0.2}
                 />
             </mesh>
             {cities.map(city => (
@@ -139,7 +125,8 @@ export function Globe() {
         <div className="w-full h-full min-h-[500px] relative bg-black">
             <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
                 <fog attach="fog" args={['#000', 5, 20]} />
-                <ambientLight intensity={0.1} />
+                <ambientLight intensity={0.3} />
+                <directionalLight position={[5, 3, 5]} intensity={1} />
 
                 <Stars radius={100} depth={50} count={7000} factor={4} saturation={0} fade speed={0.5} />
 

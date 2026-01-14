@@ -19,14 +19,14 @@ export function Settings() {
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <span className="text-gray-600 dark:text-gray-300">Time Format (24h)</span>
-                            <div className="w-12 h-6 bg-blue-600 rounded-full relative">
-                                <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm" />
+                            <div className="w-12 h-6 bg-gray-700 dark:bg-gray-300 rounded-full relative">
+                                <div className="absolute right-1 top-1 w-4 h-4 bg-white dark:bg-black rounded-full shadow-sm" />
                             </div>
                         </div>
                         <div className="flex items-center justify-between">
                             <span className="text-gray-600 dark:text-gray-300">Show Seconds</span>
-                            <div className="w-12 h-6 bg-blue-600 rounded-full relative">
-                                <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm" />
+                            <div className="w-12 h-6 bg-gray-700 dark:bg-gray-300 rounded-full relative">
+                                <div className="absolute right-1 top-1 w-4 h-4 bg-white dark:bg-black rounded-full shadow-sm" />
                             </div>
                         </div>
                     </div>

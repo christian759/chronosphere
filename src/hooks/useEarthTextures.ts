@@ -5,10 +5,10 @@ import { TextureLoader } from 'three';
 // For this demo, we will use standard THREE.js placeholder textures or reliable CDNs
 export function useEarthTextures() {
     const [day, night, clouds, normal] = useLoader(TextureLoader, [
-        'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
-        'https://unpkg.com/three-globe/example/img/earth-night.jpg',
-        'https://unpkg.com/three-globe/example/img/earth-clouds.png',
-        'https://unpkg.com/three-globe/example/img/earth-topology.png'
+        'https://cdn.jsdelivr.net/npm/three-globe@2.31.0/example/img/earth-blue-marble.jpg',
+        'https://cdn.jsdelivr.net/npm/three-globe@2.31.0/example/img/earth-night.jpg',
+        'https://cdn.jsdelivr.net/npm/three-globe@2.31.0/example/img/earth-clouds.png',
+        'https://cdn.jsdelivr.net/npm/three-globe@2.31.0/example/img/earth-topology.png'
     ]);
 
     return { day, night, clouds, normal };

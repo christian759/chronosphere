@@ -27,7 +27,7 @@ export function ImmersiveLayout({ children, onCitySelect }: ImmersiveLayoutProps
                     <h1 className="text-3xl font-display font-bold text-white tracking-widest drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
                         CHRONOSPHERE
                     </h1>
-                    <div className="text-blue-400 text-xs tracking-[0.3em] font-mono">GLOBAL TIME SYSTEM</div>
+                    <div className="text-gray-400 text-xs tracking-[0.3em] font-mono">GLOBAL TIME SYSTEM</div>
                 </div>
             </div>
 
@@ -80,7 +80,7 @@ export function ImmersiveLayout({ children, onCitySelect }: ImmersiveLayoutProps
             >
                 <div className="p-4 border-b border-white/10 flex items-center justify-between">
                     <h2 className="text-white font-bold flex items-center gap-2">
-                        <Clock size={16} className="text-blue-400" />
+                        <Clock size={16} className="text-gray-400" />
                         TRACKED SYSTEMS
                     </h2>
                 </div>
