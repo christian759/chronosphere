@@ -22,10 +22,10 @@ export function Navbar() {
             className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-white/5 backdrop-blur-md border-b border-white/10"
         >
             <Link to="/" className="flex items-center gap-2 group">
-                <div className="relative w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 animate-spin-slow group-hover:animate-pulse">
-                    <div className="absolute inset-0 bg-white blur-md opacity-20 group-hover:opacity-40" />
+                <div className="relative w-8 h-8 rounded-full bg-gradient-to-tr from-gray-700 to-gray-400 dark:from-gray-200 dark:to-white animate-spin-slow group-hover:animate-pulse">
+                    <div className="absolute inset-0 bg-white dark:bg-black blur-md opacity-20 group-hover:opacity-40" />
                 </div>
-                <span className="text-xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 tracking-wider">
+                <span className="text-xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-600 dark:from-gray-100 dark:to-gray-400 tracking-wider">
                     CHRONOSPHERE
                 </span>
             </Link>

@@ -11,7 +11,7 @@ export function Favorites() {
                 <h1 className="text-4xl font-display font-bold text-gray-900 dark:text-white">
                     My Clocks
                 </h1>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition">
+                <button className="px-4 py-2 bg-gray-800 text-white dark:bg-gray-200 dark:text-black rounded-lg text-sm hover:bg-gray-900 dark:hover:bg-white transition">
                     + Add City
                 </button>
             </div>

@@ -17,14 +17,14 @@ export function ClockCard({ city }: ClockCardProps) {
             animate={{ opacity: 1, y: 0 }}
             className="relative p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden group cursor-pointer"
         >
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-500/5 to-gray-300/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
             {/* Glow Effect */}
-            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-20 blur-lg transition duration-500 group-hover:duration-200" />
+            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-gray-700 via-gray-500 to-gray-400 opacity-0 group-hover:opacity-20 blur-lg transition duration-500 group-hover:duration-200" />
 
             <div className="relative z-10 flex flex-col items-center">
                 <div className="text-gray-400 dark:text-gray-300 text-sm font-medium tracking-widest uppercase mb-2 flex items-center gap-2">
-                    <Clock size={14} className="group-hover:text-blue-400 transition-colors" />
+                    <Clock size={14} className="group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
                     {city.name}
                 </div>
 
