@@ -24,15 +24,6 @@ export function ImmersiveLayout({ children, onCitySelect }: ImmersiveLayoutProps
                 {children}
             </div>
 
-            {/* Top Overlay */}
-            <div className="absolute top-0 left-0 right-0 z-20 p-6 flex justify-between items-start pointer-events-none">
-                <div className="pointer-events-auto">
-                    <h1 className="text-3xl font-display font-bold text-white tracking-widest drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
-                        CHRONOSPHERE
-                    </h1>
-                    <div className="text-gray-400 text-xs tracking-[0.3em] font-mono">GLOBAL TIME SYSTEM</div>
-                </div>
-            </div>
 
             {/* Left Panel: Search & Cities */}
             <motion.div
@@ -134,8 +125,5 @@ export function ImmersiveLayout({ children, onCitySelect }: ImmersiveLayoutProps
                 </button>
             </motion.div>
         </div>
-    );
-}
-        </div >
     );
 }

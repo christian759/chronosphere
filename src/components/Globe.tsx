@@ -113,7 +113,7 @@ function Atmosphere({ radius }: { radius: number }) {
     );
 }
 
-function RotatingEarth() {
+function RotatingEarth({ targetCityId }: { targetCityId?: string | null }) {
     const groupRef = useRef<THREE.Group>(null);
     const cloudsRef = useRef<THREE.Mesh>(null);
     const { allCities } = useWorldTime();
@@ -126,9 +126,59 @@ function RotatingEarth() {
         TEXTURES.clouds,
     ]);
 
+    // Smooth transition state
+    const targetRotation = useRef<{ y: number; x: number } | null>(null);
+
+    const targetCity = useMemo(() =>
+        targetCityId ? allCities.find(c => c.id === targetCityId) : null
+        , [allCities, targetCityId]);
+
+    useEffect(() => {
+        if (targetCity) {
+            // Calculate required rotation to bring city to front (Z+)
+            // Phi is (90-lat), Theta is (lng+180)
+            // But we want to reverse the coordinate mapping to find the rotation
+            // Longitude focus: lng + 180 = theta. We want theta to point at the camera (usually 0 or PI depending on setup)
+            // In our latLongToVector3:
+            // theta = (lng + 180) * (Math.PI / 180)
+            // x = -(radius * sin(phi) * cos(theta))
+            // z = radius * sin(phi) * sin(theta)
+            // To make z positive and x = 0, we need theta to be PI/2
+
+            const theta = (targetCity.lng + 180) * (Math.PI / 180);
+            const phi = (90 - targetCity.lat) * (Math.PI / 180);
+
+            // We rotate the GROUP, so we want the city to land at (0, 0, R)
+            // Group rotation Y: moves the city horizontally.
+            // City's local theta is 'theta'. We want (theta + groupRotationY) to be PI/2 (world Z+)
+            // groupRotationY = PI/2 - theta
+
+            targetRotation.current = {
+                y: Math.PI / 2 - theta,
+                x: phi - Math.PI / 2 // Rotate X to bring latitude to center
+            };
+        } else {
+            targetRotation.current = null;
+        }
+    }, [targetCity]);
+
     useFrame(() => {
-        if (groupRef.current) groupRef.current.rotation.y += 0.0005;
-        if (cloudsRef.current) cloudsRef.current.rotation.y += 0.0007;
+        if (!groupRef.current) return;
+
+        if (targetRotation.current) {
+            // Lerp towards target rotation
+            groupRef.current.rotation.y += (targetRotation.current.y - groupRef.current.rotation.y) * 0.05;
+            groupRef.current.rotation.x += (targetRotation.current.x - groupRef.current.rotation.x) * 0.05;
+        } else {
+            // Auto-rotation when no city is selected
+            groupRef.current.rotation.y += 0.0005;
+            // Slowly reset X rotation if it was changed
+            groupRef.current.rotation.x *= 0.95;
+        }
+
+        if (cloudsRef.current) {
+            cloudsRef.current.rotation.y += 0.0007;
+        }
     });
 
     return (
@@ -168,7 +218,11 @@ function RotatingEarth() {
     );
 }
 
-export function Globe() {
+export interface GlobeProps {
+    targetCityId?: string | null;
+}
+
+export function Globe({ targetCityId }: GlobeProps) {
     return (
         <div className="w-full h-full min-h-[500px] relative bg-black overflow-hidden">
             <Suspense fallback={
@@ -182,7 +236,7 @@ export function Globe() {
                     <ambientLight intensity={0.6} />
                     <pointLight position={[10, 10, 10]} intensity={1.5} />
                     <Stars radius={100} depth={50} count={6000} factor={4} saturation={0} fade speed={1} />
-                    <RotatingEarth />
+                    <RotatingEarth targetCityId={targetCityId} />
                     <OrbitControls
                         enableZoom={true}
                         enablePan={false}
