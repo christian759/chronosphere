@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-type Theme = 'light' | 'dark' | 'cyberpunk' | 'futuristic';
+type Theme = 'light' | 'dark';
 
 export function useTheme() {
     const [theme, setTheme] = useState<Theme>(() => {
@@ -15,7 +15,7 @@ export function useTheme() {
         const root = window.document.documentElement;
 
         // Remove all theme classes
-        root.classList.remove('light', 'dark', 'cyberpunk', 'futuristic');
+        root.classList.remove('light', 'dark');
 
         // Add current theme
         root.classList.add(theme);
@@ -23,8 +23,7 @@ export function useTheme() {
         localStorage.setItem('theme', theme);
     }, [theme]);
 
-    // Specific check for dark mode logic
-    const isDark = theme !== 'light';
+    const isDark = theme === 'dark';
 
     return { theme, setTheme, isDark };
 }
