@@ -5,9 +5,9 @@ import * as THREE from 'three';
 import { useWorldTime, type CityData } from '../hooks/useWorldTime';
 import { latLongToVector3 } from '../utils/coordinates';
 
-// Textures from Three.js examples / NASA
+// Optimized Textures (2K for performance)
 const TEXTURES = {
-    day: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_day_4096.jpg',
+    day: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg',
     specular: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_specular_2048.jpg',
     normal: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_normal_2048.jpg',
     clouds: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_clouds_1024.png',
@@ -56,7 +56,7 @@ function CountryBorders({ radius }: { radius: number }) {
             {borderLines.map((points, i) => (
                 <line key={i}>
                     <bufferGeometry attach="geometry" onUpdate={self => self.setFromPoints(points)} />
-                    <lineBasicMaterial attach="material" color="#ffffff" opacity={0.2} transparent />
+                    <lineBasicMaterial attach="material" color="#ffffff" opacity={0.15} transparent />
                 </line>
             ))}
         </group>
@@ -73,7 +73,7 @@ function CityMarker({ city, radius }: { city: CityData; radius: number }) {
                 onPointerOver={() => setHovered(true)}
                 onPointerOut={() => setHovered(false)}
             >
-                <sphereGeometry args={[hovered ? 0.035 : 0.02, 12, 12]} />
+                <sphereGeometry args={[hovered ? 0.03 : 0.02, 12, 12]} />
                 <meshBasicMaterial
                     color={hovered ? "#00f2ff" : "#ffffff"}
                     transparent
@@ -81,18 +81,16 @@ function CityMarker({ city, radius }: { city: CityData; radius: number }) {
                 />
             </mesh>
 
-            {/* Glowing ring for city */}
             <mesh rotation-x={Math.PI / 2}>
-                <ringGeometry args={[0.03, 0.04, 32]} />
+                <ringGeometry args={[0.025, 0.035, 32]} />
                 <meshBasicMaterial color="#00f2ff" transparent opacity={hovered ? 0.6 : 0.1} />
             </mesh>
 
             {hovered && (
                 <Html distanceFactor={8}>
-                    <div className="bg-black/90 backdrop-blur-md text-white px-3 py-2 rounded-lg text-xs whitespace-nowrap border border-cyan-500/30 shadow-[0_0_15px_rgba(0,242,255,0.2)]">
+                    <div className="bg-black/90 backdrop-blur-md text-white px-3 py-2 rounded-lg text-xs whitespace-nowrap border border-cyan-500/30 shadow-lg">
                         <div className="font-bold">{city.name}</div>
                         <div className="text-cyan-400 text-[10px] tracking-wider uppercase">{city.country}</div>
-                        <div className="text-gray-400 text-[10px] mt-1 font-mono">{city.timezone}</div>
                     </div>
                 </Html>
             )}
@@ -101,15 +99,13 @@ function CityMarker({ city, radius }: { city: CityData; radius: number }) {
 }
 
 function Atmosphere({ radius }: { radius: number }) {
-    const meshRef = useRef<THREE.Mesh>(null);
-
     return (
-        <mesh ref={meshRef}>
-            <sphereGeometry args={[radius * 1.15, 64, 64]} />
+        <mesh>
+            <sphereGeometry args={[radius * 1.05, 32, 32]} />
             <meshStandardMaterial
-                color="#0066ff"
+                color="#4facfe"
                 transparent
-                opacity={0.1}
+                opacity={0.15}
                 side={THREE.BackSide}
                 blending={THREE.AdditiveBlending}
             />
@@ -131,51 +127,42 @@ function RotatingEarth() {
     ]);
 
     useFrame(() => {
-        if (groupRef.current) {
-            groupRef.current.rotation.y += 0.0005;
-        }
-        if (cloudsRef.current) {
-            cloudsRef.current.rotation.y += 0.0007;
-        }
+        if (groupRef.current) groupRef.current.rotation.y += 0.0005;
+        if (cloudsRef.current) cloudsRef.current.rotation.y += 0.0007;
     });
 
     return (
         <group>
             <group ref={groupRef}>
-                {/* Main Earth Mesh */}
-                <mesh castShadow receiveShadow>
-                    <sphereGeometry args={[EARTH_RADIUS, 64, 64]} />
+                <mesh receiveShadow>
+                    <sphereGeometry args={[EARTH_RADIUS, 48, 48]} />
                     <meshPhongMaterial
                         map={dayMap}
                         specularMap={specularMap}
                         normalMap={normalMap}
                         normalScale={new THREE.Vector2(0.85, 0.85)}
                         specular={new THREE.Color('grey')}
-                        shininess={10}
+                        shininess={5}
                     />
                 </mesh>
 
-                {/* Clouds Layer */}
                 <mesh ref={cloudsRef}>
-                    <sphereGeometry args={[EARTH_RADIUS + 0.02, 64, 64]} />
+                    <sphereGeometry args={[EARTH_RADIUS + 0.02, 48, 48]} />
                     <meshPhongMaterial
                         map={cloudsMap}
                         transparent
-                        opacity={0.4}
+                        opacity={0.3}
                         depthWrite={false}
                     />
                 </mesh>
 
-                {/* Country Borders */}
                 <CountryBorders radius={EARTH_RADIUS} />
 
-                {/* City Markers */}
                 {allCities.map(city => (
                     <CityMarker key={city.id} city={city} radius={EARTH_RADIUS + 0.03} />
                 ))}
             </group>
 
-            {/* Atmosphere Glow */}
             <Atmosphere radius={EARTH_RADIUS} />
         </group>
     );
@@ -186,49 +173,26 @@ export function Globe() {
         <div className="w-full h-full min-h-[500px] relative bg-black overflow-hidden">
             <Suspense fallback={
                 <div className="flex flex-col items-center justify-center w-full h-full text-white font-mono gap-4">
-                    <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
-                    <div className="text-[10px] tracking-[0.3em] uppercase opacity-50 animate-pulse">CONNECTING_TO_CORE...</div>
+                    <div className="w-10 h-10 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+                    <div className="text-[10px] tracking-widest uppercase opacity-50">Syncing...</div>
                 </div>
             }>
-                <Canvas camera={{ position: [0, 0, 7], fov: 50 }} shadows>
+                <Canvas camera={{ position: [0, 0, 7], fov: 45 }}>
                     <color attach="background" args={['#000000']} />
-
-                    <ambientLight intensity={0.5} />
-                    <pointLight position={[10, 10, 10]} intensity={1.5} castShadow />
-                    <spotLight
-                        position={[-10, 10, 10]}
-                        angle={0.15}
-                        penumbra={1}
-                        intensity={1}
-                        castShadow
-                    />
-
-                    <Stars
-                        radius={100}
-                        depth={60}
-                        count={10000}
-                        factor={7}
-                        saturation={0}
-                        fade
-                        speed={1}
-                    />
-
+                    <ambientLight intensity={0.6} />
+                    <pointLight position={[10, 10, 10]} intensity={1.5} />
+                    <Stars radius={100} depth={50} count={6000} factor={4} saturation={0} fade speed={1} />
                     <RotatingEarth />
-
                     <OrbitControls
                         enableZoom={true}
                         enablePan={false}
                         minDistance={3.2}
-                        maxDistance={15}
+                        maxDistance={12}
                         rotateSpeed={0.5}
                         zoomSpeed={0.6}
                     />
                 </Canvas>
             </Suspense>
-
-            {/* Cinematic Overlay */}
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/40 via-transparent to-black/60" />
-            <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]" />
         </div>
     );
 }
