@@ -2,17 +2,22 @@ import { motion } from 'framer-motion';
 import { useWorldTime } from '../hooks/useWorldTime';
 import { Globe } from '../components/Globe';
 import { ClockCard } from '../components/ClockCard';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, MapPin, Clock, Globe2, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export function Home() {
-    const { cities } = useWorldTime();
+    const { cities, allCities } = useWorldTime();
 
     // Feature only the first 3 cities
     const featuredCities = cities.slice(0, 3);
 
+    // Calculate some interesting stats
+    const totalCities = allCities.length;
+    const continents = [...new Set(allCities.map(c => c.continent))].length;
+    const countries = [...new Set(allCities.map(c => c.country))].length;
+
     return (
-        <div className="space-y-16">
+        <div className="space-y-20">
             {/* Hero Section */}
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div className="space-y-8">
@@ -26,7 +31,7 @@ export function Home() {
                             REIMAGINED
                         </h1>
                         <p className="text-lg text-gray-600 dark:text-gray-300 max-w-lg mb-8 leading-relaxed">
-                            Experience the world's pulse with ChronoSphere. interactive 3D visualizations, real-time synchronization, and futuristic aesthetics.
+                            Experience the world's pulse with ChronoSphere. Track time across {totalCities} major cities with interactive 3D visualizations and real-time synchronization.
                         </p>
 
                         <div className="flex gap-4">
@@ -54,24 +59,130 @@ export function Home() {
                 </motion.div>
             </section>
 
+            {/* Stats Section */}
+            <section>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10"
+                    >
+                        <Globe2 className="text-gray-700 dark:text-gray-300 mb-4" size={32} />
+                        <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{totalCities}</div>
+                        <div className="text-gray-600 dark:text-gray-400">Global Cities</div>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10"
+                    >
+                        <MapPin className="text-gray-700 dark:text-gray-300 mb-4" size={32} />
+                        <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{continents}</div>
+                        <div className="text-gray-600 dark:text-gray-400">Continents Covered</div>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10"
+                    >
+                        <TrendingUp className="text-gray-700 dark:text-gray-300 mb-4" size={32} />
+                        <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">{countries}</div>
+                        <div className="text-gray-600 dark:text-gray-400">Countries Tracked</div>
+                    </motion.div>
+                </div>
+            </section>
+
             {/* Featured Clocks */}
             <section>
                 <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-2xl font-display font-bold text-gray-900 dark:text-white">Global Pulse</h2>
-                    <Link to="/favorites" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-sm font-medium">View All Cities</Link>
+                    <div>
+                        <h2 className="text-3xl font-display font-bold text-gray-900 dark:text-white mb-2">Your World Clocks</h2>
+                        <p className="text-gray-600 dark:text-gray-400">Track time in your favorite cities</p>
+                    </div>
+                    <Link to="/favorites" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-sm font-medium flex items-center gap-2">
+                        Manage Cities <ArrowRight size={16} />
+                    </Link>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {featuredCities.map((city, idx) => (
-                        <motion.div
-                            key={city.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 * idx }}
+                {featuredCities.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {featuredCities.map((city, idx) => (
+                            <motion.div
+                                key={city.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1 * idx }}
+                            >
+                                <ClockCard city={city} />
+                            </motion.div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-12 bg-white/5 rounded-2xl border border-white/10">
+                        <Clock className="mx-auto text-gray-400 mb-4" size={48} />
+                        <h3 className="text-xl font-bold text-gray-700 dark:text-gray-300 mb-2">
+                            No cities added yet
+                        </h3>
+                        <p className="text-gray-500 dark:text-gray-400 mb-6">
+                            Add your first city to start tracking world time
+                        </p>
+                        <Link
+                            to="/favorites"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-900 dark:bg-gray-200 dark:hover:bg-white text-white dark:text-black rounded-lg font-medium transition-all"
                         >
-                            <ClockCard city={city} />
-                        </motion.div>
-                    ))}
+                            <MapPin size={18} />
+                            Add Cities
+                        </Link>
+                    </div>
+                )}
+            </section>
+
+            {/* Features Section */}
+            <section>
+                <h2 className="text-3xl font-display font-bold text-gray-900 dark:text-white mb-8 text-center">
+                    Powerful Features
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="p-8 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                            Interactive 3D Globe
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400">
+                            Explore a realistic rotating Earth with city markers. Click and drag to navigate, zoom to explore different regions.
+                        </p>
+                    </div>
+
+                    <div className="p-8 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                            Real-Time Synchronization
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400">
+                            All clocks update every second with precise timezone calculations across all {totalCities} supported cities.
+                        </p>
+                    </div>
+
+                    <div className="p-8 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                            Comprehensive City Database
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400">
+                            Access cities from {continents} continents and {countries} countries with population and timezone data.
+                        </p>
+                    </div>
+
+                    <div className="p-8 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                            Personalized Tracking
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400">
+                            Save your favorite cities with automatic localStorage persistence. Your selections are remembered across sessions.
+                        </p>
+                    </div>
                 </div>
             </section>
         </div>
