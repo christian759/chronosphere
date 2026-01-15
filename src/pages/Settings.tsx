@@ -1,4 +1,3 @@
-import { ThemeSwitcher } from '../components/ThemeSwitcher';
 import { useWorldTime } from '../hooks/useWorldTime';
 import { motion } from 'framer-motion';
 
@@ -10,13 +9,6 @@ export function Settings() {
             <h1 className="text-4xl font-display font-bold text-gray-900 dark:text-white">Settings</h1>
 
             <div className="space-y-6">
-                <section className="bg-white/5 backdrop-blur-md p-8 rounded-2xl border border-white/10">
-                    <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Appearance</h2>
-                    <div className="flex items-center justify-between">
-                        <span className="text-gray-600 dark:text-gray-300">Theme</span>
-                        <ThemeSwitcher />
-                    </div>
-                </section>
 
                 <section className="bg-white/5 backdrop-blur-md p-8 rounded-2xl border border-white/10">
                     <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Preferences</h2>

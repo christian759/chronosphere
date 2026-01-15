@@ -165,11 +165,29 @@ export const WORLD_CITIES: CityData[] = [
 ];
 
 export function searchCities(query: string): CityData[] {
-    const lowerQuery = query.toLowerCase();
+    const lowerQuery = query.toLowerCase().trim();
+    if (!lowerQuery) return [];
+
     return WORLD_CITIES.filter(city =>
         city.name.toLowerCase().includes(lowerQuery) ||
-        city.country.toLowerCase().includes(lowerQuery)
-    );
+        city.country.toLowerCase().includes(lowerQuery) ||
+        city.continent.toLowerCase().includes(lowerQuery) ||
+        city.timezone.toLowerCase().includes(lowerQuery)
+    ).sort((a, b) => {
+        // Boost exact matches or prefix matches
+        const aName = a.name.toLowerCase();
+        const bName = b.name.toLowerCase();
+        const aCountry = a.country.toLowerCase();
+        const bCountry = b.country.toLowerCase();
+
+        if (aName === lowerQuery || aCountry === lowerQuery) return -1;
+        if (bName === lowerQuery || bCountry === lowerQuery) return 1;
+
+        if (aName.startsWith(lowerQuery)) return -1;
+        if (bName.startsWith(lowerQuery)) return 1;
+
+        return 0;
+    });
 }
 
 export function getCityById(id: string): CityData | undefined {
