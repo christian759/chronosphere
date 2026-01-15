@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Search, Clock } from 'lucide-react';
 import { ClockCard } from '../components/ClockCard';
@@ -10,10 +10,24 @@ interface ImmersiveLayoutProps {
 }
 
 export function ImmersiveLayout({ children, onCitySelect }: ImmersiveLayoutProps) {
-    const [leftOpen, setLeftOpen] = useState(true);
-    const [rightOpen, setRightOpen] = useState(true);
+    const [leftOpen, setLeftOpen] = useState(window.innerWidth > 768);
+    const [rightOpen, setRightOpen] = useState(window.innerWidth > 768);
     const [searchQuery, setSearchQuery] = useState('');
     const { cities, searchCities, addFavorite, removeFavorite, isFavorite } = useWorldTime();
+
+    // Update screen size awareness
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth < 768) {
+                // Keep closed on mobile unless manually opened
+            } else {
+                setLeftOpen(true);
+                setRightOpen(true);
+            }
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const searchResults = searchQuery ? searchCities(searchQuery) : [];
 
@@ -29,9 +43,9 @@ export function ImmersiveLayout({ children, onCitySelect }: ImmersiveLayoutProps
             <motion.div
                 animate={{ x: leftOpen ? 0 : '-100%' }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="relative z-10 w-80 h-full backdrop-blur-xl border-r flex flex-col bg-black/40 border-white/10"
+                className="absolute md:relative z-20 w-full md:w-80 h-full backdrop-blur-xl border-r flex flex-col bg-black/60 md:bg-black/40 border-white/10"
             >
-                <div className="p-4 border-b flex items-center gap-2 border-white/10">
+                <div className="p-4 md:p-4 border-b flex items-center gap-2 border-white/10 pt-20 md:pt-4">
                     <Search className="text-gray-400" size={20} />
                     <input
                         type="text"
@@ -42,28 +56,31 @@ export function ImmersiveLayout({ children, onCitySelect }: ImmersiveLayoutProps
                     />
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar pb-24 md:pb-4">
                     <h3 className="text-xs font-bold text-gray-500 uppercase mb-4 px-2">
                         {searchQuery ? 'Search Results' : 'Quick Access'}
                     </h3>
                     {(searchQuery ? searchResults : cities).map(city => (
                         <div
                             key={city.id}
-                            className="w-full p-2 rounded-lg transition-all flex items-center justify-between group hover:bg-white/5"
+                            className="w-full p-3 md:p-2 rounded-lg transition-all flex items-center justify-between group hover:bg-white/5 active:bg-white/10"
                         >
                             <button
-                                onClick={() => onCitySelect?.(city.id)}
+                                onClick={() => {
+                                    onCitySelect?.(city.id);
+                                    if (window.innerWidth < 768) setLeftOpen(false);
+                                }}
                                 className="flex-1 text-left"
                             >
-                                <div className="font-medium text-sm transition-colors text-gray-300 group-hover:text-white">{city.name}</div>
-                                <div className="text-[10px] text-gray-500 font-mono">{city.timezone}</div>
+                                <div className="font-medium text-base md:text-sm transition-colors text-gray-300 group-hover:text-white">{city.name}</div>
+                                <div className="text-xs md:text-[10px] text-gray-500 font-mono">{city.timezone}</div>
                             </button>
                             <button
                                 onClick={() => isFavorite(city.id) ? removeFavorite(city.id) : addFavorite(city.id)}
-                                className={`p-2 rounded-md transition-colors ${isFavorite(city.id) ? 'text-cyan-500 hover:bg-cyan-500/10' : 'text-gray-500 hover:bg-white/10'}`}
+                                className={`p-3 md:p-2 rounded-md transition-colors ${isFavorite(city.id) ? 'text-cyan-500 hover:bg-cyan-500/10' : 'text-gray-500 hover:bg-white/10'}`}
                                 title={isFavorite(city.id) ? "Untrack" : "Track"}
                             >
-                                <Clock size={14} fill={isFavorite(city.id) ? "currentColor" : "none"} />
+                                <Clock size={16} fill={isFavorite(city.id) ? "currentColor" : "none"} />
                             </button>
                         </div>
                     ))}
@@ -75,7 +92,7 @@ export function ImmersiveLayout({ children, onCitySelect }: ImmersiveLayoutProps
                 {/* Toggle Button */}
                 <button
                     onClick={() => setLeftOpen(!leftOpen)}
-                    className="absolute -right-8 top-1/2 -translate-y-1/2 w-8 h-16 backdrop-blur-xl border-y border-r rounded-r-xl flex items-center justify-center transition-colors bg-black/40 border-white/10 text-white/50 hover:text-white"
+                    className="absolute -right-8 top-1/2 -translate-y-1/2 w-8 h-20 md:h-16 backdrop-blur-xl border-y border-r rounded-r-xl flex items-center justify-center transition-colors bg-black/60 md:bg-black/40 border-white/10 text-white hover:text-white z-30 shadow-xl"
                 >
                     {leftOpen ? <ChevronLeft /> : <ChevronRight />}
                 </button>
@@ -88,9 +105,9 @@ export function ImmersiveLayout({ children, onCitySelect }: ImmersiveLayoutProps
             <motion.div
                 animate={{ x: rightOpen ? 0 : '100%' }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="relative z-10 w-80 h-full backdrop-blur-xl border-l flex flex-col bg-black/40 border-white/10"
+                className="absolute right-0 md:relative z-20 w-full md:w-80 h-full backdrop-blur-xl border-l flex flex-col bg-black/60 md:bg-black/40 border-white/10"
             >
-                <div className="p-4 border-b flex items-center justify-between border-white/10">
+                <div className="p-4 border-b flex items-center justify-between border-white/10 pt-20 md:pt-4">
                     <h2 className="text-sm font-bold flex items-center gap-2 tracking-widest text-white">
                         <Clock size={14} className="text-gray-400" />
                         TRACKED
@@ -100,7 +117,7 @@ export function ImmersiveLayout({ children, onCitySelect }: ImmersiveLayoutProps
                     </span>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar pb-24 md:pb-4">
                     {cities.map(city => (
                         <ClockCard
                             key={city.id}
@@ -119,7 +136,7 @@ export function ImmersiveLayout({ children, onCitySelect }: ImmersiveLayoutProps
 
                 <button
                     onClick={() => setRightOpen(!rightOpen)}
-                    className="absolute -left-8 top-1/2 -translate-y-1/2 w-8 h-16 backdrop-blur-xl border-y border-l rounded-l-xl flex items-center justify-center transition-colors bg-black/40 border-white/10 text-white/50 hover:text-white"
+                    className="absolute -left-8 top-1/2 -translate-y-1/2 w-8 h-20 md:h-16 backdrop-blur-xl border-y border-l rounded-l-xl flex items-center justify-center transition-colors bg-black/60 md:bg-black/40 border-white/10 text-white hover:text-white z-30 shadow-xl"
                 >
                     {rightOpen ? <ChevronRight /> : <ChevronLeft />}
                 </button>

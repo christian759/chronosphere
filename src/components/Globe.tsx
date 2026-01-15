@@ -195,7 +195,7 @@ export function Globe({ targetCityId }: GlobeProps) {
             <Suspense fallback={
                 <div className="flex flex-col items-center justify-center w-full h-full text-white font-mono gap-4">
                     <div className="w-10 h-10 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
-                    <div className="text-[10px] tracking-widest uppercase opacity-50">Syncing...</div>
+                    <div className="text-[10px] tracking-widest uppercase opacity-50">loading globe</div>
                 </div>
             }>
                 <Canvas camera={{ position: [0, 0, 7], fov: 45 }}>
