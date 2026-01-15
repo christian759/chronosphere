@@ -51,30 +51,50 @@ function CountryBorders({ radius }: { radius: number }) {
 function CityMarker({ city, radius }: { city: CityData; radius: number }) {
     const position = useMemo(() => latLongToVector3(city.lat, city.lng, radius), [city, radius]);
     const [hovered, setHovered] = useState(false);
+    const [pinned, setPinned] = useState(false);
+
+    const showDetails = hovered || pinned;
 
     return (
         <group position={position}>
             <mesh
-                onPointerOver={() => setHovered(true)}
-                onPointerOut={() => setHovered(false)}
+                onPointerOver={(e) => {
+                    e.stopPropagation();
+                    setHovered(true);
+                }}
+                onPointerOut={(e) => {
+                    e.stopPropagation();
+                    setHovered(false);
+                }}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setPinned(!pinned);
+                }}
             >
-                <sphereGeometry args={[hovered ? 0.03 : 0.02, 12, 12]} />
+                <sphereGeometry args={[showDetails ? 0.04 : 0.02, 16, 16]} />
                 <meshBasicMaterial
-                    color={hovered ? "#00f2ff" : "#ffffff"}
+                    color={showDetails ? "#00f2ff" : "#ffffff"}
                     transparent
                     opacity={0.8}
                 />
             </mesh>
 
             <mesh rotation-x={Math.PI / 2}>
-                <ringGeometry args={[0.025, 0.035, 32]} />
-                <meshBasicMaterial color="#00f2ff" transparent opacity={hovered ? 0.6 : 0.1} />
+                <ringGeometry args={[0.025, 0.045, 32]} />
+                <meshBasicMaterial
+                    color="#00f2ff"
+                    transparent
+                    opacity={showDetails ? 0.8 : 0.1}
+                />
             </mesh>
 
-            {hovered && (
-                <Html distanceFactor={8}>
-                    <div className="bg-black/95 backdrop-blur-md text-white px-3 py-2 rounded-lg text-xs whitespace-nowrap border border-white/20 shadow-xl">
-                        <div className="font-bold tracking-tight">{city.name}</div>
+            {showDetails && (
+                <Html distanceFactor={8} pointerEvents="none">
+                    <div className="bg-black/90 backdrop-blur-md text-white px-3 py-2 rounded-lg text-xs whitespace-nowrap border border-white/20 shadow-2xl select-none">
+                        <div className="font-bold tracking-tight flex items-center gap-2">
+                            {city.name}
+                            {pinned && <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />}
+                        </div>
                         <div className="text-gray-400 text-[10px] tracking-wider uppercase">{city.country}</div>
                     </div>
                 </Html>

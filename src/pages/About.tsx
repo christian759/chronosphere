@@ -11,7 +11,7 @@ export function About() {
     return (
         <div className="space-y-16 max-w-4xl mx-auto text-center mt-8 pb-20">
             <div className="space-y-4">
-                <h1 className="text-5xl md:text-6xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-300 to-gray-500">
+                <h1 className="text-4xl md:text-6xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-300 to-gray-500">
                     About ChronoSphere
                 </h1>
                 <p className="text-xl text-gray-400">

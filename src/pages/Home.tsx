@@ -23,7 +23,7 @@ export function Home() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8 }}
                     >
-                        <h1 className="text-5xl sm:text-7xl md:text-8xl font-display font-bold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-300 to-gray-500 mb-4 md:mb-6 drop-shadow-lg">
+                        <h1 className="text-4xl sm:text-6xl md:text-7xl font-display font-bold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-300 to-gray-500 mb-4 md:mb-6 drop-shadow-lg">
                             TIME <br className="hidden sm:block" />
                             REIMAGINED
                         </h1>
