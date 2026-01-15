@@ -5,61 +5,46 @@ import * as THREE from 'three';
 import { useWorldTime, type CityData } from '../hooks/useWorldTime';
 import { latLongToVector3 } from '../utils/coordinates';
 
-// Optimized Textures (2K for performance)
+// Higher performance textures (1K)
 const TEXTURES = {
-    day: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg',
-    specular: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_specular_2048.jpg',
+    day: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_1024.jpg',
+    specular: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_specular_2048.jpg', // Keep 2k for spec/normal as they are usually smaller files but higher impact
     normal: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_normal_2048.jpg',
     clouds: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_clouds_1024.png',
 };
 
+import worldBorders from '../assets/world-borders.json';
+
 function CountryBorders({ radius }: { radius: number }) {
-    const [geoJson, setGeoJson] = useState<any>(null);
+    const borderGeometry = useMemo(() => {
+        const positions: number[] = [];
 
-    useEffect(() => {
-        // Fetch simplified world borders GeoJSON
-        fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
-            .then(res => res.json())
-            .then(data => setGeoJson(data))
-            .catch(err => console.error("Error loading GeoJSON", err));
-    }, []);
-
-    const borderLines = useMemo(() => {
-        if (!geoJson) return [];
-
-        const lines: THREE.Vector3[][] = [];
-        geoJson.features.forEach((feature: any) => {
+        worldBorders.features.forEach((feature: any) => {
             const { type, coordinates } = feature.geometry;
+            const processPolygon = (poly: any) => {
+                for (let i = 0; i < poly.length - 1; i++) {
+                    const p1 = latLongToVector3(poly[i][1], poly[i][0], radius + 0.01);
+                    const p2 = latLongToVector3(poly[i + 1][1], poly[i + 1][0], radius + 0.01);
+                    positions.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
+                }
+            };
+
             if (type === 'Polygon') {
-                coordinates.forEach((poly: any) => {
-                    const points = poly.map(([lng, lat]: [number, number]) =>
-                        latLongToVector3(lat, lng, radius + 0.01)
-                    );
-                    lines.push(points);
-                });
+                coordinates.forEach(processPolygon);
             } else if (type === 'MultiPolygon') {
-                coordinates.forEach((multi: any) => {
-                    multi.forEach((poly: any) => {
-                        const points = poly.map(([lng, lat]: [number, number]) =>
-                            latLongToVector3(lat, lng, radius + 0.01)
-                        );
-                        lines.push(points);
-                    });
-                });
+                coordinates.forEach((multi: any) => multi.forEach(processPolygon));
             }
         });
-        return lines;
-    }, [geoJson, radius]);
+
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        return geometry;
+    }, [radius]);
 
     return (
-        <group>
-            {borderLines.map((points, i) => (
-                <line key={i}>
-                    <bufferGeometry attach="geometry" onUpdate={self => self.setFromPoints(points)} />
-                    <lineBasicMaterial attach="material" color="#ffffff" opacity={0.15} transparent />
-                </line>
-            ))}
-        </group>
+        <lineSegments geometry={borderGeometry}>
+            <lineBasicMaterial color="#ffffff" opacity={0.1} transparent />
+        </lineSegments>
     );
 }
 
@@ -166,9 +151,9 @@ function RotatingEarth({ targetCityId }: { targetCityId?: string | null }) {
         if (!groupRef.current) return;
 
         if (targetRotation.current) {
-            // Lerp towards target rotation
-            groupRef.current.rotation.y += (targetRotation.current.y - groupRef.current.rotation.y) * 0.05;
-            groupRef.current.rotation.x += (targetRotation.current.x - groupRef.current.rotation.x) * 0.05;
+            // Snappier transition (0.15 instead of 0.05)
+            groupRef.current.rotation.y += (targetRotation.current.y - groupRef.current.rotation.y) * 0.15;
+            groupRef.current.rotation.x += (targetRotation.current.x - groupRef.current.rotation.x) * 0.15;
         } else {
             // Auto-rotation when no city is selected
             groupRef.current.rotation.y += 0.0005;
