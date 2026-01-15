@@ -59,16 +59,24 @@ function CityMarker({ city, radius }: { city: CityData; radius: number }) {
         <group position={position}>
             <mesh
                 onPointerOver={(e) => {
-                    e.stopPropagation();
-                    setHovered(true);
+                    if (e.pointerType === 'mouse') {
+                        e.stopPropagation();
+                        setHovered(true);
+                    }
                 }}
                 onPointerOut={(e) => {
-                    e.stopPropagation();
-                    setHovered(false);
+                    if (e.pointerType === 'mouse') {
+                        e.stopPropagation();
+                        setHovered(false);
+                    }
                 }}
-                onClick={(e) => {
+                onPointerDown={(e) => {
                     e.stopPropagation();
                     setPinned(!pinned);
+                    // On touch, we want to clear hover to ensure the toggle works
+                    if (e.pointerType !== 'mouse') {
+                        setHovered(false);
+                    }
                 }}
             >
                 <sphereGeometry args={[showDetails ? 0.04 : 0.02, 16, 16]} />
