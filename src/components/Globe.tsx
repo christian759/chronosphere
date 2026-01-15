@@ -5,10 +5,10 @@ import * as THREE from 'three';
 import { useWorldTime, type CityData } from '../hooks/useWorldTime';
 import { latLongToVector3 } from '../utils/coordinates';
 
-// Higher performance textures (1K)
+// Reliable 2K textures
 const TEXTURES = {
-    day: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_1024.jpg',
-    specular: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_specular_2048.jpg', // Keep 2k for spec/normal as they are usually smaller files but higher impact
+    day: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg',
+    specular: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_specular_2048.jpg',
     normal: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_normal_2048.jpg',
     clouds: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_clouds_1024.png',
 };
