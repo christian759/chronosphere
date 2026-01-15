@@ -1,73 +1,64 @@
-# React + TypeScript + Vite
+# 🌍 ChronoSphere
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+ChronoSphere is a premium, immersive 3D world clock application built with React, Three.js, and TypeScript. It offers a futuristic way to track global time through an interactive high-fidelity globe and synchronized temporal nodes.
 
-Currently, two official plugins are available:
+![Home Page Performance](screenshots/home_view.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Features
 
-## React Compiler
+- **Immersive 3D Globe**: Interactive Earth visualization with realistic day/night lighting, atmosphere effects, and country borders.
+- **Global Time Tracking**: Monitor time across hundreds of cities and territories worldwide.
+- **Smart Search**: Advanced prioritized search engine for cities, countries, and continents.
+- **Persistent Favorites**: Tracked cities are saved to local storage and synchronized across all views (Home, Globe, Favorites).
+- **Responsive Design**: Fully optimized for desktop and mobile devices with a sleek, adaptive UI.
+- **Dark Mode Only**: A dedicated, premium aesthetic designed for high-end digital environments.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Tech Stack
 
-## Expanding the ESLint configuration
+- **Core**: [React](https://reactjs.org/) + [TypeScript](https://www.typescriptlang.org/) + [Vite](https://vitejs.dev/)
+- **3D Engine**: [Three.js](https://threejs.org/) via [@react-three/fiber](https://github.com/pmndrs/react-three-fiber) & [@react-three/drei](https://github.com/pmndrs/drei)
+- **Styling**: [TailwindCSS](https://tailwindcss.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Icons**: [Lucide React](https://lucide.dev/)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📸 Screenshots
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Globe Interface
+![Globe View](screenshots/globe_view.png)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Home page
+![Home View](screenshots/home_view.png)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 🛠️ Installation
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/christian759/chronosphere.git
+   cd chronosphere
+   ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+3. **Run development server**:
+   ```bash
+   npm run dev
+   ```
+
+4. **Build for production**:
+   ```bash
+   npm run build
+   ```
+
+## 👤 Developer
+
+Built with ❤️ by **c2** (Christian Eighemhenrio)
+
+- **GitHub**: [@christian759](https://github.com/christian759)
+- **LinkedIn**: [Christian Eighemhenrio](https://www.linkedin.com/in/christian-eighemhenrio-1b77b63a2/)
+
+---
+
+© 2026 ChronoSphere • Digital Horizon
