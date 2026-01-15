@@ -5,6 +5,7 @@ import { GlobePage } from './pages/GlobePage';
 import { Favorites } from './pages/Favorites';
 import { Settings } from './pages/Settings';
 import { About } from './pages/About';
+import { WorldTimeProvider } from './context/WorldTimeContext';
 
 function LayoutWrapper() {
   const location = useLocation();
@@ -32,9 +33,11 @@ function LayoutWrapper() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <LayoutWrapper />
-    </BrowserRouter>
+    <WorldTimeProvider>
+      <BrowserRouter>
+        <LayoutWrapper />
+      </BrowserRouter>
+    </WorldTimeProvider>
   );
 }
 
