@@ -2,11 +2,20 @@ import { useState, useEffect } from 'react';
 import { WORLD_CITIES, searchCities, getCityById, type CityData } from '../utils/cities';
 
 const FAVORITES_STORAGE_KEY = 'chronosphere-favorites';
+const TIME_FORMAT_KEY = 'chronosphere-time-format';
 
 export type { CityData };
 
 export function useWorldTime() {
     const [time, setTime] = useState(new Date());
+    const [is12Hour, setIs12Hour] = useState<boolean>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem(TIME_FORMAT_KEY);
+            return saved ? JSON.parse(saved) : false;
+        }
+        return false;
+    });
+
     const [favoriteCityIds, setFavoriteCityIds] = useState<string[]>(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem(FAVORITES_STORAGE_KEY);
@@ -33,9 +42,10 @@ export function useWorldTime() {
     }, []);
 
     useEffect(() => {
-        // Save favorites to localStorage
+        // Save favorites and format
         localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favoriteCityIds));
-    }, [favoriteCityIds]);
+        localStorage.setItem(TIME_FORMAT_KEY, JSON.stringify(is12Hour));
+    }, [favoriteCityIds, is12Hour]);
 
     const getCityTime = (timezone: string) => {
         return new Date(time.toLocaleString('en-US', { timeZone: timezone }));
@@ -47,7 +57,7 @@ export function useWorldTime() {
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
-            hour12: false
+            hour12: is12Hour
         }).format(time);
     };
 
@@ -75,6 +85,8 @@ export function useWorldTime() {
         return favoriteCityIds.includes(cityId);
     };
 
+    const toggleTimeFormat = () => setIs12Hour(!is12Hour);
+
     const favoriteCities = favoriteCityIds
         .map(id => getCityById(id))
         .filter((city): city is CityData => city !== undefined);
@@ -90,5 +102,7 @@ export function useWorldTime() {
         addFavorite,
         removeFavorite,
         isFavorite,
+        is12Hour,
+        toggleTimeFormat
     };
 }

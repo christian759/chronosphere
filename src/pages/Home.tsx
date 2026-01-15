@@ -8,9 +8,6 @@ import { Link } from 'react-router-dom';
 export function Home() {
     const { cities, allCities } = useWorldTime();
 
-    // Feature only the first 3 cities
-    const featuredCities = cities.slice(0, 3);
-
     // Calculate some interesting stats
     const totalCities = allCities.length;
     const continents = [...new Set(allCities.map(c => c.continent))].length;
@@ -112,9 +109,9 @@ export function Home() {
                     </Link>
                 </div>
 
-                {featuredCities.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {featuredCities.map((city, idx) => (
+                {cities.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {cities.map((city, idx) => (
                             <motion.div
                                 key={city.id}
                                 initial={{ opacity: 0, y: 20 }}
@@ -127,7 +124,7 @@ export function Home() {
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-12 bg-white/5 rounded-2xl border border-white/10">
+                    <div className="text-center py-12 bg-white/10 rounded-2xl border border-white/10">
                         <Clock className="mx-auto text-gray-400 mb-4" size={48} />
                         <h3 className="text-xl font-bold text-gray-700 dark:text-gray-300 mb-2">
                             No nodes active
@@ -135,6 +132,9 @@ export function Home() {
                         <p className="text-gray-500 dark:text-gray-400 mb-6">
                             Visit the favorites section to initialize primary tracking nodes
                         </p>
+                        <Link to="/favorites" className="px-6 py-2 bg-gray-800 text-white dark:bg-gray-200 dark:text-black rounded-full text-sm font-medium inline-block">
+                            Initialize Nodes
+                        </Link>
                     </div>
                 )}
             </section>
