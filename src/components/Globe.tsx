@@ -3,6 +3,7 @@ import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls, Stars, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { useWorldTime, type CityData } from '../hooks/useWorldTime';
+import { useTheme } from '../hooks/useTheme';
 import { latLongToVector3 } from '../utils/coordinates';
 
 // Reliable 2K textures
@@ -15,7 +16,7 @@ const TEXTURES = {
 
 import worldBorders from '../assets/world-borders.json';
 
-function CountryBorders({ radius }: { radius: number }) {
+function CountryBorders({ radius, isDark }: { radius: number; isDark: boolean }) {
     const borderGeometry = useMemo(() => {
         const positions: number[] = [];
 
@@ -43,12 +44,12 @@ function CountryBorders({ radius }: { radius: number }) {
 
     return (
         <lineSegments geometry={borderGeometry}>
-            <lineBasicMaterial color="#ffffff" opacity={0.1} transparent />
+            <lineBasicMaterial color={isDark ? "#ffffff" : "#000000"} opacity={isDark ? 0.1 : 0.2} transparent />
         </lineSegments>
     );
 }
 
-function CityMarker({ city, radius }: { city: CityData; radius: number }) {
+function CityMarker({ city, radius, isDark }: { city: CityData; radius: number; isDark: boolean }) {
     const position = useMemo(() => latLongToVector3(city.lat, city.lng, radius), [city, radius]);
     const [hovered, setHovered] = useState(false);
 
@@ -60,7 +61,7 @@ function CityMarker({ city, radius }: { city: CityData; radius: number }) {
             >
                 <sphereGeometry args={[hovered ? 0.03 : 0.02, 12, 12]} />
                 <meshBasicMaterial
-                    color={hovered ? "#00f2ff" : "#ffffff"}
+                    color={hovered ? "#00f2ff" : (isDark ? "#ffffff" : "#64748b")}
                     transparent
                     opacity={0.8}
                 />
@@ -73,9 +74,9 @@ function CityMarker({ city, radius }: { city: CityData; radius: number }) {
 
             {hovered && (
                 <Html distanceFactor={8}>
-                    <div className="bg-black/95 backdrop-blur-md text-white px-3 py-2 rounded-lg text-xs whitespace-nowrap border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+                    <div className="bg-white dark:bg-black/95 backdrop-blur-md text-gray-900 dark:text-white px-3 py-2 rounded-lg text-xs whitespace-nowrap border border-gray-200 dark:border-white/20 shadow-xl">
                         <div className="font-bold tracking-tight">{city.name}</div>
-                        <div className="text-gray-400 text-[10px] tracking-wider uppercase">{city.country}</div>
+                        <div className="text-gray-500 dark:text-gray-400 text-[10px] tracking-wider uppercase">{city.country}</div>
                     </div>
                 </Html>
             )}
@@ -83,22 +84,22 @@ function CityMarker({ city, radius }: { city: CityData; radius: number }) {
     );
 }
 
-function Atmosphere({ radius }: { radius: number }) {
+function Atmosphere({ radius, isDark }: { radius: number; isDark: boolean }) {
     return (
         <mesh>
             <sphereGeometry args={[radius * 1.05, 32, 32]} />
             <meshStandardMaterial
-                color="#4facfe"
+                color={isDark ? "#4facfe" : "#7dd3fc"}
                 transparent
-                opacity={0.15}
+                opacity={isDark ? 0.15 : 0.25}
                 side={THREE.BackSide}
-                blending={THREE.AdditiveBlending}
+                blending={isDark ? THREE.AdditiveBlending : THREE.NormalBlending}
             />
         </mesh>
     );
 }
 
-function RotatingEarth({ targetCityId }: { targetCityId?: string | null }) {
+function RotatingEarth({ targetCityId, isDark }: { targetCityId?: string | null; isDark: boolean }) {
     const groupRef = useRef<THREE.Group>(null);
     const cloudsRef = useRef<THREE.Mesh>(null);
     const { allCities } = useWorldTime();
@@ -120,27 +121,12 @@ function RotatingEarth({ targetCityId }: { targetCityId?: string | null }) {
 
     useEffect(() => {
         if (targetCity) {
-            // Calculate required rotation to bring city to front (Z+)
-            // Phi is (90-lat), Theta is (lng+180)
-            // But we want to reverse the coordinate mapping to find the rotation
-            // Longitude focus: lng + 180 = theta. We want theta to point at the camera (usually 0 or PI depending on setup)
-            // In our latLongToVector3:
-            // theta = (lng + 180) * (Math.PI / 180)
-            // x = -(radius * sin(phi) * cos(theta))
-            // z = radius * sin(phi) * sin(theta)
-            // To make z positive and x = 0, we need theta to be PI/2
-
             const theta = (targetCity.lng + 180) * (Math.PI / 180);
             const phi = (90 - targetCity.lat) * (Math.PI / 180);
 
-            // We rotate the GROUP, so we want the city to land at (0, 0, R)
-            // Group rotation Y: moves the city horizontally.
-            // City's local theta is 'theta'. We want (theta + groupRotationY) to be PI/2 (world Z+)
-            // groupRotationY = PI/2 - theta
-
             targetRotation.current = {
                 y: Math.PI / 2 - theta,
-                x: phi - Math.PI / 2 // Rotate X to bring latitude to center
+                x: phi - Math.PI / 2
             };
         } else {
             targetRotation.current = null;
@@ -151,13 +137,10 @@ function RotatingEarth({ targetCityId }: { targetCityId?: string | null }) {
         if (!groupRef.current) return;
 
         if (targetRotation.current) {
-            // Snappier transition (0.15 instead of 0.05)
             groupRef.current.rotation.y += (targetRotation.current.y - groupRef.current.rotation.y) * 0.15;
             groupRef.current.rotation.x += (targetRotation.current.x - groupRef.current.rotation.x) * 0.15;
         } else {
-            // Auto-rotation when no city is selected
             groupRef.current.rotation.y += 0.0005;
-            // Slowly reset X rotation if it was changed
             groupRef.current.rotation.x *= 0.95;
         }
 
@@ -176,8 +159,8 @@ function RotatingEarth({ targetCityId }: { targetCityId?: string | null }) {
                         specularMap={specularMap}
                         normalMap={normalMap}
                         normalScale={new THREE.Vector2(0.85, 0.85)}
-                        specular={new THREE.Color('grey')}
-                        shininess={5}
+                        specular={new THREE.Color(isDark ? 'grey' : '#white')}
+                        shininess={isDark ? 5 : 10}
                     />
                 </mesh>
 
@@ -186,19 +169,19 @@ function RotatingEarth({ targetCityId }: { targetCityId?: string | null }) {
                     <meshPhongMaterial
                         map={cloudsMap}
                         transparent
-                        opacity={0.3}
+                        opacity={isDark ? 0.3 : 0.4}
                         depthWrite={false}
                     />
                 </mesh>
 
-                <CountryBorders radius={EARTH_RADIUS} />
+                <CountryBorders radius={EARTH_RADIUS} isDark={isDark} />
 
                 {allCities.map(city => (
-                    <CityMarker key={city.id} city={city} radius={EARTH_RADIUS + 0.03} />
+                    <CityMarker key={city.id} city={city} radius={EARTH_RADIUS + 0.03} isDark={isDark} />
                 ))}
             </group>
 
-            <Atmosphere radius={EARTH_RADIUS} />
+            <Atmosphere radius={EARTH_RADIUS} isDark={isDark} />
         </group>
     );
 }
@@ -208,20 +191,22 @@ export interface GlobeProps {
 }
 
 export function Globe({ targetCityId }: GlobeProps) {
+    const { isDark } = useTheme();
+
     return (
-        <div className="w-full h-full min-h-[500px] relative bg-black overflow-hidden">
+        <div className={`w-full h-full min-h-[500px] relative overflow-hidden transition-colors duration-500 ${isDark ? 'bg-black' : 'bg-slate-50'}`}>
             <Suspense fallback={
-                <div className="flex flex-col items-center justify-center w-full h-full text-white font-mono gap-4">
+                <div className="flex flex-col items-center justify-center w-full h-full text-slate-800 dark:text-white font-mono gap-4">
                     <div className="w-10 h-10 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
                     <div className="text-[10px] tracking-widest uppercase opacity-50">Syncing...</div>
                 </div>
             }>
                 <Canvas camera={{ position: [0, 0, 7], fov: 45 }}>
-                    <color attach="background" args={['#000000']} />
-                    <ambientLight intensity={0.6} />
-                    <pointLight position={[10, 10, 10]} intensity={1.5} />
-                    <Stars radius={100} depth={50} count={6000} factor={4} saturation={0} fade speed={1} />
-                    <RotatingEarth targetCityId={targetCityId} />
+                    <color attach="background" args={[isDark ? '#000000' : '#f8fafc']} />
+                    <ambientLight intensity={isDark ? 0.6 : 0.8} />
+                    <pointLight position={[10, 10, 10]} intensity={isDark ? 1.5 : 2.0} />
+                    {isDark && <Stars radius={100} depth={50} count={6000} factor={4} saturation={0} fade speed={1} />}
+                    <RotatingEarth targetCityId={targetCityId} isDark={isDark} />
                     <OrbitControls
                         enableZoom={true}
                         enablePan={false}
